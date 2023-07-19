@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 N = 5
 bias = 3
 
-def __main__():
+def bais():
 	x1 = np.random.random(N)
 	x2 = x1 + [np.random.randint(10) / 10 for i in range(N)] + bias
 	C1 = [x1, x2]
@@ -32,7 +32,35 @@ def __main__():
 	plt.grid(True)
 	plt.show()
 
+def activation(x):
+	return 0 if x <= 0 else 1
+
+
+def go(C):
+	x = np.array([C[0], C[1], 1])
+	w1 = [1, 1, -1.5]
+	w2 = [1, 1, -0.5]
+	w_hidden = np.array([w1, w2])
+	w_out = np.array([-1, 1, -0.5])
+
+	sum = np.dot(w_hidden, x)
+	out = [activation(x) for x in sum]
+	out.append(1)
+	out = np.array(out)
+
+	sum = np.dot(w_out, out)
+	y = activation(sum)
+	return y
+
+
+def xor():
+	C1 = [(1, 0), (0, 1)]
+	C2 = [(0, 0), (1 , 1)]
+
+	print(go(C1[0]), go(C1[1]))
+	print(go(C2[0]), go(C2[1]))
 
 
 if __name__ == '__main__':
-	__main__()
+	#bais()
+	xor()
