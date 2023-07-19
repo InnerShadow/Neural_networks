@@ -57,6 +57,9 @@ def __main__():
 		y, out = go_forward(x[0:3])
 		print(f"Out NN value:  {y} => {x[-1]}")
 
+	print("W1: ", W1)
+	print("W2: ", W2)
+
 
 if __name__ == '__main__':
 	__main__()
