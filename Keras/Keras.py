@@ -20,7 +20,7 @@ def __main__():
 	log = model.fit(celsia, faringats, epochs = 500, verbose = False)
 	print("Ends training")
 
-	print(model.predict([100]))
+	print(model.predict([252]))
 	print(model.get_weights())
 
 	plt.plot(log.history['loss'])
