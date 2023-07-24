@@ -48,20 +48,20 @@ def __main__():
 	x_train = x_train / WHITE_MAX
 	x_test = x_test / WHITE_MAX
 
-	show(x_train, 25)
+	#show(x_train, 25)
 
 	# Make vectors instad of numbers 
 	y_train_cat = keras.utils.to_categorical(y_train, 10)
 	y_test_cat = keras.utils.to_categorical(y_test, 10)
 
 	model = keras.Sequential([Flatten(input_shape = (28, 28, 1)), 
-		Dense(128 * 2, activation = 'relu'), Dense(10, activation = 'softmax')])
+		Dense(128, activation = 'relu'), Dense(10, activation = 'softmax')])
 
 	print(model.summary())
 
 	model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
-	model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.3)
+	model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.2)
 
 	model.evaluate(x_test, y_test_cat)
 
@@ -71,8 +71,6 @@ def __main__():
 
 	print("Full vector: ", res)
 	print("Guess it is: ", np.argmax(res))
-
-	print("X: ", x.shape)
 
 	plt.imshow(x_test[index], cmap = plt.cm.binary)
 	plt.show()
@@ -116,3 +114,4 @@ def __main__():
 
 if __name__ == '__main__':
 	__main__()
+
