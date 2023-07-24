@@ -55,7 +55,7 @@ def __main__():
 	y_test_cat = keras.utils.to_categorical(y_test, 10)
 
 	model = keras.Sequential([Flatten(input_shape = (28, 28, 1)), 
-		Dense(128, activation = 'relu'), Dense(10, activation = 'softmax')])
+		Dense(128, activation = 'relu'), Dense(int(128 / 2), activation = 'relu'), Dense(10, activation = 'softmax')])
 
 	print(model.summary())
 
