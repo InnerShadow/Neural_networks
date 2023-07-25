@@ -54,6 +54,14 @@ def __main__():
 	y_train_cat = keras.utils.to_categorical(y_train, 10)
 	y_test_cat = keras.utils.to_categorical(y_test, 10)
 
+	#make cearten validation set
+	size_val = 10000
+	x_val_split = x_train[:size_val]
+	y_val_split = y_train_cat[:size_val]
+
+	x_train_split = x_train[size_val:]
+	y_train_split = y_train_cat[size_val:]
+
 	model = keras.Sequential([Flatten(input_shape = (28, 28, 1)), 
 		Dense(128, activation = 'relu'), Dense(int(128 / 2), activation = 'relu'), Dense(10, activation = 'softmax')])
 
@@ -64,7 +72,9 @@ def __main__():
 
 	model.compile(optimizer = myOPT, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
-	model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.2)
+	#model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.2)
+
+	model.fit(x_train_split, y_train_split, batch_size = 32, epochs = 5, validation_data = (x_val_split, y_val_split))
 
 	model.evaluate(x_test, y_test_cat)
 
