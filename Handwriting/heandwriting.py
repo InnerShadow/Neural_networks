@@ -59,7 +59,10 @@ def __main__():
 
 	print(model.summary())
 
-	model.compile(optimizer = 'adam', loss = 'categorical_crossentropy', metrics = ['accuracy'])
+	myAdam = keras.optimizers.Adam(learning_rate = 0.01)
+	myOPT = keras.optimizers.SGD(learning_rate = 0.01, momentum = 0.0, nesterov = True)
+
+	model.compile(optimizer = myOPT, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
 	model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.2)
 
