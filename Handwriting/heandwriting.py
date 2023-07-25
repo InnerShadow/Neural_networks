@@ -10,6 +10,7 @@ from PIL import Image
 from tensorflow import keras
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Dense, Flatten
+from sklearn.model_selection import train_test_split
 
 WHITE_MAX = 255
 
@@ -61,6 +62,9 @@ def __main__():
 
 	x_train_split = x_train[size_val:]
 	y_train_split = y_train_cat[size_val:]
+
+	#use sklearn
+	x_train_split, x_val_split, y_train_split, y_val_split = train_test_split(x_train, y_train_cat, test_size = 0.2)
 
 	model = keras.Sequential([Flatten(input_shape = (28, 28, 1)), 
 		Dense(128, activation = 'relu'), Dense(int(128 / 2), activation = 'relu'), Dense(10, activation = 'softmax')])
