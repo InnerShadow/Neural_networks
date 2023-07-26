@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from tensorflow import keras
 from tensorflow.keras.datasets import mnist
-from tensorflow.keras.layers import Dense, Flatten
+from tensorflow.keras.layers import Dense, Flatten, Dropout
 from sklearn.model_selection import train_test_split
 
 WHITE_MAX = 255
@@ -63,11 +63,20 @@ def __main__():
 	x_train_split = x_train[size_val:]
 	y_train_split = y_train_cat[size_val:]
 
+	#For graphs:
+
+	limit = 5000
+	x_train_data = x_train[:limit]
+	y_train_data = y_train_cat[:limit]
+
+	x_valid = x_train[limit:limit * 2]
+	y_valid = y_train_cat[limit:limit * 2]
+
 	#use sklearn
 	x_train_split, x_val_split, y_train_split, y_val_split = train_test_split(x_train, y_train_cat, test_size = 0.2)
 
 	model = keras.Sequential([Flatten(input_shape = (28, 28, 1)), 
-		Dense(128, activation = 'relu'), Dense(int(128 / 2), activation = 'relu'), Dense(10, activation = 'softmax')])
+		Dense(int(128 / 2), activation = 'relu'), Dropout(0.1), Dense(10, activation = 'softmax')])
 
 	print(model.summary())
 
@@ -103,6 +112,14 @@ def __main__():
 	print("My gauess it is: ", np.argmax(res))
 
 	plt.imshow(pixel_array, cmap = plt.cm.binary)
+	plt.show()
+
+	#Show graphs
+
+	his = model.fit(x_train_data, y_train_data, epochs = 50, batch_size = 32, validation_data = (x_valid, y_valid))
+
+	plt.plot(his.history['loss'])
+	plt.plot(his.history['val_loss'])
 	plt.show()
 
 	# Show how it works:
