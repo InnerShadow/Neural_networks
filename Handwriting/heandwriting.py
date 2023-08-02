@@ -26,7 +26,7 @@ def show(x_train, N):
 
 
 def Get_my_immage():
-	image_path = "test.png"
+	image_path = "Nazar_test_3.png"
 	image = Image.open(image_path)
 
 	gary_image = image.convert("L")
@@ -76,7 +76,7 @@ def __main__():
 	x_train_split, x_val_split, y_train_split, y_val_split = train_test_split(x_train, y_train_cat, test_size = 0.2)
 
 	model = keras.Sequential([Flatten(input_shape = (28, 28, 1)), 
-		Dense(int(128 / 2), activation = 'relu'), Dropout(0.1), Dense(10, activation = 'softmax')])
+		Dense(int(128), activation = 'relu'), Dropout(0.1), Dense(10, activation = 'softmax')])
 
 	print(model.summary())
 
@@ -85,9 +85,9 @@ def __main__():
 
 	model.compile(optimizer = myOPT, loss = 'categorical_crossentropy', metrics = ['accuracy'])
 
-	#model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.2)
+	model.fit(x_train, y_train_cat, batch_size = 32, epochs = 5, validation_split = 0.2)
 
-	model.fit(x_train_split, y_train_split, batch_size = 32, epochs = 5, validation_data = (x_val_split, y_val_split))
+	#model.fit(x_train_split, y_train_split, batch_size = 32, epochs = 5, validation_data = (x_val_split, y_val_split))
 
 	model.evaluate(x_test, y_test_cat)
 
