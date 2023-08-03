@@ -72,11 +72,7 @@ def __main__():
 	model.evaluate(x_test, y_test_cat)
 
 	Predict_number_by_path(model, "test.png")
-	Predict_number_by_path(model, "Nazar_test.png")
-	Predict_number_by_path(model, "Nazar_test_1.png")
 	Predict_number_by_path(model, "Nazar_test_2.png")
-	Predict_number_by_path(model, "Nazar_test_3.png")
-
 
 if __name__ == '__main__':
 	__main__()
