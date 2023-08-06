@@ -96,11 +96,11 @@ def compute_loss(model, loss_weights, init_image, gram_style_features, content_f
 
 
 def __main__():
-	ResizeImg("img.jpg", 720, 720)
-	ResizeImg("img_style.jpg", 720, 720)
+	ResizeImg("img_1.jpg", 480, 480)
+	ResizeImg("img_style_1.jpg", 480, 480)
 
-	img = Image.open('img.jpg')
-	img_style = Image.open('img_style.jpg')
+	img = Image.open('img_1.jpg')
+	img_style = Image.open('img_style_1.jpg')
 
 	plt.subplot(1, 2, 1)
 	plt.imshow(img)
@@ -166,6 +166,9 @@ def __main__():
 	max_vals = 255 - norm_mean
 	imgs = []
 
+	plt.ion()
+	fig, ax = plt.subplots()
+
 	for i in range(num_iterators):
 		with tf.GradientTape() as tape:
 			all_loss = compute_loss(**cfg)
@@ -185,6 +188,14 @@ def __main__():
 			plot_image = deprecess_image(init_image.numpy())
 			imgs.append(plot_image)
 			print('Iteration: {}'.format(i))
+
+		ax.clear()
+		plt.imshow(imgs[len(imgs) - 1])
+		plt.draw()
+		plt.gcf().canvas.flush_events() 
+
+
+	plt.ioff()
 
 	plt.imshow(best_img)
 	plt.show()
