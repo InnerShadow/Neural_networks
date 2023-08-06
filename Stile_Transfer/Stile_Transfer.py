@@ -105,8 +105,8 @@ def __main__():
 	ResizeImg(str_img, height, width)
 	ResizeImg(str_img_style, height, width)
 
-	img = Image.open('img_1.jpg')
-	img_style = Image.open('img_style_1.jpg')
+	img = Image.open(str_img)
+	img_style = Image.open(str_img_style)
 
 	plt.subplot(1, 2, 1)
 	plt.imshow(img)
