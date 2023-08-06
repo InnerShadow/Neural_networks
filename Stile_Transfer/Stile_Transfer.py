@@ -17,9 +17,9 @@ B = 103.939
 G = 116.779
 R = 123.680
 
-def ResizeImg(path):
+def ResizeImg(path, height, width):
 	img = Image.open(path)
-	img = img.resize((624, 624))
+	img = img.resize((height, width))
 	img.save(path)
 
 
@@ -97,8 +97,8 @@ def compute_loss(model, loss_weights, init_image, gram_style_features, content_f
 
 
 def __main__():
-	ResizeImg("img.jpg")
-	ResizeImg("img_style.jpg")
+	ResizeImg("img.jpg", 720, 720)
+	ResizeImg("img_style.jpg", 720, 720)
 
 	img = Image.open('img.jpg')
 	img_style = Image.open('img_style.jpg')
