@@ -8,7 +8,6 @@ import tensorflow as tf
 
 from PIL import Image
 from tensorflow import keras
-from io import BytesIO
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D, MaxPooling2D
 from sklearn.model_selection import train_test_split
