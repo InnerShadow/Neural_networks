@@ -96,8 +96,12 @@ def compute_loss(model, loss_weights, init_image, gram_style_features, content_f
 
 
 def __main__():
-	ResizeImg("img_1.jpg", 480, 480)
-	ResizeImg("img_style_1.jpg", 480, 480)
+
+	str_img = "img_1.jpg"
+	str_img_style = "img_style_1.jpg"
+
+	ResizeImg(str_img, 480, 480)
+	ResizeImg(str_img_style, 480, 480)
 
 	img = Image.open('img_1.jpg')
 	img_style = Image.open('img_style_1.jpg')
