@@ -100,8 +100,10 @@ def __main__():
 	str_img = "img_1.jpg"
 	str_img_style = "img_style_1.jpg"
 
-	ResizeImg(str_img, 480, 480)
-	ResizeImg(str_img_style, 480, 480)
+	height, width = (480, 480)
+
+	ResizeImg(str_img, height, width)
+	ResizeImg(str_img_style, height, width)
 
 	img = Image.open('img_1.jpg')
 	img_style = Image.open('img_style_1.jpg')
