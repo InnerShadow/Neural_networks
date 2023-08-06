@@ -74,5 +74,6 @@ def __main__():
 	Predict_number_by_path(model, "test.png")
 	Predict_number_by_path(model, "Nazar_test_2.png")
 
+
 if __name__ == '__main__':
 	__main__()
