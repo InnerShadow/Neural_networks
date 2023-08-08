@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 
 from PIL import Image
+from random import randint
 from tensorflow import keras
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Dense, Flatten, Dropout, BatchNormalization, Conv2D, MaxPooling2D, UpSampling2D, InputLayer
@@ -17,10 +18,9 @@ from skimage.io import imsave
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-def ResizeImg(path, height, width):
-	img = Image.open(path)
+def ResizeImg(img, height, width, impath):
 	img = img.resize((height, width))
-	img.save(path)
+	img.save(impath)
 
 
 def processed_image(img, h, w):
@@ -36,28 +36,44 @@ def processed_image(img, h, w):
 	return X, Y, size
 
 
+def load_images(directory, h, w):
+	image_paths = [f for f in os.listdir(directory) if f.lower().endswith('.jpg')]
+	images = []
+
+	for img_path in image_paths:
+		img = Image.open(os.path.join(directory, img_path))
+		ResizeImg(img, w, h, os.path.join(directory, img_path))
+		X, Y, size = processed_image(img, h, w)
+		images.append((X, Y, size))
+
+	return images
+
+
 def __main__():
-	str_img = 'img.jpg'
-	ResizeImg(str_img, 256, 256)
-	img = Image.open(str_img)
+	
+	directory = 'Train'
+	image_data = load_images(directory, 256, 256)
 
-	X, Y, size = processed_image(img, 256, 256)
+	input_images = []
+	output_images = []
 
-	to_paint_img_str = 'img.jpg'
-	to_paint_img = Image.open(to_paint_img_str)
+	for X, Y, size in image_data:
+		input_images.append(X)
+		output_images.append(Y)
 
-	toPaintX, toPaintY, toPaintSize = processed_image(to_paint_img, 256, 256)
+	X_data = np.concatenate(input_images, axis = 0)
+	Y_data = np.concatenate(output_images, axis = 0)
 
 	data_generator = ImageDataGenerator(
-	    rotation_range = 20,       
-	    width_shift_range = 0.1,   
-	    height_shift_range = 0.1, 
-	    brightness_range = (0.8, 1.2), 
-	    horizontal_flip = True,    
+	    rotation_range = 5,       
+	    width_shift_range = 0.05,   
+	    height_shift_range = 0.05, 
+	    brightness_range = (0.8, 1.0), 
+	    #horizontal_flip = True,    
 	    rescale = 1.0 / 255
 	)
 
-	augmented_data = data_generator.flow(X, Y, batch_size = 1000)
+	augmented_data = data_generator.flow(X_data, Y_data, batch_size = 2000)
 
 	model = Sequential()
 	model.add(InputLayer(input_shape = (None, None, 1)))
@@ -80,9 +96,12 @@ def __main__():
 	print(model.summary())
 
 	model.compile(optimizer = 'adam', loss = 'mse')
-	model.fit(augmented_data, epochs = 50)
+	model.fit(augmented_data, epochs = 20)
 
-	output = model.predict(toPaintX)
+	index = randint(0, len(image_data) - 1)
+	x = image_data[index]
+
+	output = model.predict(x[0])
 
 	output *= 128
 	min_vals, max_vals = -128, 127
@@ -91,9 +110,9 @@ def __main__():
 	cur = np.zeros((size[0], size[1], 3))
 	cur[:, :, 0] = np.clip(X[0][:, :, 0], 0, 100)
 	cur[:, :, 1:] = ab
-	plt.subplot(1, 2, 1)
-	plt.imshow(img)
-	plt.subplot(1, 2, 2)
+	# plt.subplot(1, 2, 1)
+	# plt.imshow(image_data[index])
+	# plt.subplot(1, 2, 2)
 	plt.imshow(lab2rgb(cur))
 	plt.show()
 
