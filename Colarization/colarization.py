@@ -18,7 +18,8 @@ from skimage.io import imsave
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
-def ResizeImg(img, height, width, impath):
+def ResizeImg(impath, height, width):
+	img = Image.open(impath)
 	img = img.resize((height, width))
 	img.save(impath)
 
@@ -51,29 +52,11 @@ def load_images(directory, h, w):
 
 def __main__():
 	
-	directory = 'Train'
-	image_data = load_images(directory, 256, 256)
+	str_img = "Train/img0.jpg"
+	ResizeImg(str_img, 256, 256)
+	img = Image.open(str_img)
 
-	input_images = []
-	output_images = []
-
-	for X, Y, size in image_data:
-		input_images.append(X)
-		output_images.append(Y)
-
-	X_data = np.concatenate(input_images, axis = 0)
-	Y_data = np.concatenate(output_images, axis = 0)
-
-	data_generator = ImageDataGenerator(
-	    rotation_range = 5,       
-	    width_shift_range = 0.05,   
-	    height_shift_range = 0.05, 
-	    brightness_range = (0.8, 1.0), 
-	    #horizontal_flip = True,    
-	    rescale = 1.0 / 255
-	)
-
-	augmented_data = data_generator.flow(X_data, Y_data, batch_size = 2000)
+	X, Y, size = processed_image(img, 256, 256)
 
 	model = Sequential()
 	model.add(InputLayer(input_shape = (None, None, 1)))
@@ -96,23 +79,24 @@ def __main__():
 	print(model.summary())
 
 	model.compile(optimizer = 'adam', loss = 'mse')
-	model.fit(augmented_data, epochs = 20)
 
-	index = randint(0, len(image_data) - 1)
-	x = image_data[index]
+	model.fit(x = X, y = Y, epochs = 50, batch_size = 1)
 
-	output = model.predict(x[0])
+	img = Image.open(str_img)
+	X, Y, size = processed_image(img, 256, 256)
+
+	output = model.predict(X)
 
 	output *= 128
 	min_vals, max_vals = -128, 127
 	ab = np.clip(output[0], min_vals, max_vals)
 
 	cur = np.zeros((size[0], size[1], 3))
-	cur[:, :, 0] = np.clip(X[0][:, :, 0], 0, 100)
-	cur[:, :, 1:] = ab
-	# plt.subplot(1, 2, 1)
-	# plt.imshow(image_data[index])
-	# plt.subplot(1, 2, 2)
+	cur[:,:,0] = np.clip(X[0][:, :, 0], 0, 100)
+	cur[:,:,1:] = ab
+	plt.subplot(1, 2, 1)
+	plt.imshow(img)
+	plt.subplot(1, 2, 2)
 	plt.imshow(lab2rgb(cur))
 	plt.show()
 
