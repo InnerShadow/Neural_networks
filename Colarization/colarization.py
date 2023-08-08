@@ -15,6 +15,7 @@ from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_a
 from skimage.color import rgb2lab, lab2rgb
 from skimage.io import imsave
 from sklearn.model_selection import train_test_split
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 def ResizeImg(path, height, width):
 	img = Image.open(path)
@@ -47,6 +48,17 @@ def __main__():
 
 	toPaintX, toPaintY, toPaintSize = processed_image(to_paint_img, 256, 256)
 
+	data_generator = ImageDataGenerator(
+	    rotation_range = 20,       
+	    width_shift_range = 0.1,   
+	    height_shift_range = 0.1, 
+	    brightness_range = (0.8, 1.2), 
+	    horizontal_flip = True,    
+	    rescale = 1.0 / 255
+	)
+
+	augmented_data = data_generator.flow(X, Y, batch_size = 1000)
+
 	model = Sequential()
 	model.add(InputLayer(input_shape = (None, None, 1)))
 	model.add(Conv2D(64, (3, 3), activation = 'relu', padding = 'same'))
@@ -68,7 +80,7 @@ def __main__():
 	print(model.summary())
 
 	model.compile(optimizer = 'adam', loss = 'mse')
-	model.fit(x = X, y = Y, batch_size = 1, epochs = 50)
+	model.fit(augmented_data, epochs = 50)
 
 	output = model.predict(toPaintX)
 
