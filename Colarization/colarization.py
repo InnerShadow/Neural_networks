@@ -93,7 +93,7 @@ def __main__():
 
 	model.compile(optimizer = 'adam', loss = 'mse')
 
-	model.fit(x = X_data, y = Y_data, epochs = 100, batch_size = 1)
+	model.fit(x = X_data, y = Y_data, epochs = 50, batch_size = 1)
 
 	img = Image.open(str_img)
 	X, Y, size = processed_image(img, 256, 256)
@@ -112,6 +112,10 @@ def __main__():
 	plt.subplot(1, 2, 2)
 	plt.imshow(lab2rgb(cur))
 	plt.show()
+
+	res = lab2rgb(cur)
+	res = (res * 255).astype(np.uint8)
+	imsave("res.jpg", res)
 
 
 if __name__ == '__main__':
