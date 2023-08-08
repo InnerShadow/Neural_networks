@@ -5,6 +5,7 @@ import numpy as np
 import random
 import matplotlib.pyplot as plt
 import tensorflow as tf
+import glob
 
 from PIL import Image
 from random import randint
@@ -38,19 +39,31 @@ def processed_image(img, h, w):
 
 
 def load_images(directory, h, w):
-	image_paths = [f for f in os.listdir(directory) if f.lower().endswith('.jpg')]
-	images = []
+    image_paths = glob.glob(os.path.join(directory, "*.jpg"))
+    images = []
 
-	for img_path in image_paths:
-		img = Image.open(os.path.join(directory, img_path))
-		ResizeImg(img, w, h, os.path.join(directory, img_path))
-		X, Y, size = processed_image(img, h, w)
-		images.append((X, Y, size))
+    for img_path in image_paths:
+        img = Image.open(img_path)
+        img.resize((h, w))
+        X, Y, size = processed_image(img, h, w)	
+        images.append((X, Y, size))
 
-	return images
+    return images
 
 
 def __main__():
+
+	images = load_images("Train", 256, 256)
+
+	X_data = []
+	Y_data = []
+
+	for X, Y, size in images:
+		X_data.append(X)
+		Y_data.append(Y)
+
+	X_data = np.concatenate(X_data)
+	Y_data = np.concatenate(Y_data)
 	
 	str_img = "Train/img0.jpg"
 	ResizeImg(str_img, 256, 256)
@@ -80,7 +93,7 @@ def __main__():
 
 	model.compile(optimizer = 'adam', loss = 'mse')
 
-	model.fit(x = X, y = Y, epochs = 50, batch_size = 1)
+	model.fit(x = X_data, y = Y_data, epochs = 100, batch_size = 1)
 
 	img = Image.open(str_img)
 	X, Y, size = processed_image(img, 256, 256)
