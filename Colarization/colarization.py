@@ -53,6 +53,15 @@ def load_images(directory, h, w):
 
 def __main__():
 
+	datagen = ImageDataGenerator(
+		rotation_range = 5,
+		width_shift_range = 0.1,
+		height_shift_range = 0.1,
+		shear_range = 0.1,
+		zoom_range = 0.1,
+		fill_mode = 'nearest'
+	)
+
 	images = load_images("Train", 256, 256)
 
 	X_data = []
@@ -93,7 +102,17 @@ def __main__():
 
 	model.compile(optimizer = 'adam', loss = 'mse')
 
-	model.fit(x = X_data, y = Y_data, epochs = 50, batch_size = 1)
+	batch_size = 32
+	epochs = 200
+
+	for epoch in range(epochs):
+		print(f"Epoch {epoch + 1}/{epochs}")
+		for batch in datagen.flow(X_data, Y_data, batch_size = batch_size):
+			X_batch, Y_batch = batch
+			model.fit(x = X_batch, y = Y_batch, batch_size = batch_size)
+			break
+
+	#model.fit(x = X_data, y = Y_data, epochs = 50, batch_size = 1)
 
 	img = Image.open(str_img)
 	X, Y, size = processed_image(img, 256, 256)
