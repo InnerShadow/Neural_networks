@@ -107,7 +107,7 @@ def colarization(input_path, output_path):
 	model.compile(optimizer = 'adam', loss = 'mse')
 
 	batch_size = 32
-	epochs = 200
+	epochs = 250
 
 	for epoch in range(epochs):
 		print(f"Epoch {epoch + 1}/{epochs}")
@@ -264,7 +264,7 @@ def get_style(input_path_img, imput_path_style, output_path):
 	model = keras.models.Model(vgg.input, model_outputs)
 	print(model.summary())
 
-	num_iterators = 100
+	num_iterators = 25
 	content_weights = 1e3
 	style_weight = 1e-2
 
@@ -328,9 +328,12 @@ def get_style(input_path_img, imput_path_style, output_path):
 
 
 def __main__():
-	get_style("img.png", "img_style.png", "res0.png")
-	get_style("res0.png", "img_style.png", "res1.png")
-	colarization("res1.png", "res_final.png")
+	get_style("img.jpg", "img_style.jpg", "res0.jpg")
+	get_style("res0.jpg", "img_style.jpg", "res1.jpg")
+	get_style("res1.jpg", "img_style.jpg", "res2.jpg")
+	get_style("res2.jpg", "img_style.jpg", "res3.jpg")
+	get_style("res3.jpg", "img_style.jpg", "res4.jpg")
+	colarization("res4.jpg", "res_final.jpg")
 
 
 if __name__ == '__main__':
