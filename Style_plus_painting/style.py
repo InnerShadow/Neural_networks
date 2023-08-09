@@ -66,7 +66,7 @@ def colarization(input_path, output_path):
 		fill_mode = 'nearest'
 	)
 
-	images = load_images("Train", 256, 256)
+	images = load_images("Train", 480, 480)
 
 	X_data = []
 	Y_data = []
@@ -79,10 +79,10 @@ def colarization(input_path, output_path):
 	Y_data = np.concatenate(Y_data)
 	
 	str_img = input_path
-	ResizeImg(str_img, 256, 256)
+	ResizeImg(str_img, 480, 480)
 	img = Image.open(str_img)
 
-	X, Y, size = processed_image(img, 256, 256)
+	X, Y, size = processed_image(img, 480, 480)
 
 	model = Sequential()
 	model.add(InputLayer(input_shape = (None, None, 1)))
@@ -117,7 +117,7 @@ def colarization(input_path, output_path):
 			break
 
 	img = Image.open(str_img)
-	X, Y, size = processed_image(img, 256, 256)
+	X, Y, size = processed_image(img, 480, 480)
 
 	output = model.predict(X)
 
