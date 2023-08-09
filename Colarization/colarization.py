@@ -54,15 +54,15 @@ def load_images(directory, h, w):
 def __main__():
 
 	datagen = ImageDataGenerator(
-		rotation_range = 5,
-		width_shift_range = 0.1,
-		height_shift_range = 0.1,
-		shear_range = 0.1,
-		zoom_range = 0.1,
+		rotation_range = 20,
+		width_shift_range = 0.2,
+		height_shift_range = 0.2,
+		shear_range = 0.2,
+		zoom_range = 0.2,
 		fill_mode = 'nearest'
 	)
 
-	images = load_images("Train", 256, 256)
+	images = load_images("Train", 680, 680)
 
 	X_data = []
 	Y_data = []
@@ -74,11 +74,11 @@ def __main__():
 	X_data = np.concatenate(X_data)
 	Y_data = np.concatenate(Y_data)
 	
-	str_img = "Train/img0.jpg"
-	ResizeImg(str_img, 256, 256)
+	str_img = "res4.jpg"
+	ResizeImg(str_img, 680, 680)
 	img = Image.open(str_img)
 
-	X, Y, size = processed_image(img, 256, 256)
+	X, Y, size = processed_image(img, 680, 680)
 
 	model = Sequential()
 	model.add(InputLayer(input_shape = (None, None, 1)))
@@ -103,7 +103,7 @@ def __main__():
 	model.compile(optimizer = 'adam', loss = 'mse')
 
 	batch_size = 32
-	epochs = 200
+	epochs = 100
 
 	for epoch in range(epochs):
 		print(f"Epoch {epoch + 1}/{epochs}")
@@ -115,7 +115,7 @@ def __main__():
 	#model.fit(x = X_data, y = Y_data, epochs = 50, batch_size = 1)
 
 	img = Image.open(str_img)
-	X, Y, size = processed_image(img, 256, 256)
+	X, Y, size = processed_image(img, 680, 680)
 
 	output = model.predict(X)
 
