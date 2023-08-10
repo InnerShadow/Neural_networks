@@ -56,7 +56,7 @@ def __main__():
 	tokenizer.fit_on_texts([text])
 	print(tokenizer.word_index)
 
-	input_str = 'Кармон:'
+	input_str = 'Рейстлин: '
 	inp_chars = len(input_str)
 	data = tokenizer.texts_to_matrix(text)
 	n = data.shape[0] - inp_chars
@@ -72,7 +72,7 @@ def __main__():
 
 	model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = 'adam')
 
-	history = model.fit(X, Y, batch_size = 64, epochs = 150)
+	history = model.fit(X, Y, batch_size = 512, epochs = 500)
 
 	res = buildPhrase(input_str, inp_chars, model, tokenizer)
 	print(res)
@@ -80,4 +80,5 @@ def __main__():
 
 if __name__ == '__main__':
 	__main__()
+
 
