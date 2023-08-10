@@ -47,7 +47,7 @@ def __main__():
 
 	global num_characters
 
-	with open('train_data_true', 'r', encoding = 'utf-8') as f:
+	with open('Last_Challenge', 'r', encoding = 'utf-8') as f:
 		text = f.read()
 		test = text.replace('\ufeff', ' ')
 		text = re.sub(r'[^А-я –.,?!:]', '', text)
