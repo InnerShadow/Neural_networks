@@ -14,7 +14,7 @@ from tensorflow import keras
 from tensorflow.keras.datasets import mnist
 from tensorflow.keras.layers import Dense, SimpleRNN, Input
 from tensorflow.keras.preprocessing.text import Tokenizer
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
 from skimage.color import rgb2lab, lab2rgb
 from skimage.io import imsave
@@ -56,7 +56,7 @@ def __main__():
 	tokenizer.fit_on_texts([text])
 	print(tokenizer.word_index)
 
-	input_str = 'Рейстлин: '
+	input_str = 'Рейстлин:'
 	inp_chars = len(input_str)
 	data = tokenizer.texts_to_matrix(text)
 	n = data.shape[0] - inp_chars
@@ -64,21 +64,28 @@ def __main__():
 	X = np.array([data[i:i + inp_chars, :] for i in range(n)])
 	Y = data[inp_chars:]
 
-	model = Sequential()
-	model.add(Input((inp_chars, num_characters)))
-	model.add(SimpleRNN(128, activation = 'tanh'))
-	model.add(Dense(num_characters, activation = 'softmax'))
-	model.summary()
+	try:
+		model = load_model('model.h5')
+		model.summary()
+	except Exception:
+		model = Sequential()
+		model.add(Input((inp_chars, num_characters)))
+		model.add(SimpleRNN(512, activation = 'tanh'))
+		model.add(Dense(256, activation = 'relu'))
+		model.add(Dense(num_characters, activation = 'softmax'))
 
-	model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = 'adam')
+		model.summary()
 
-	history = model.fit(X, Y, batch_size = 512, epochs = 500)
+		model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = 'adam')
+
+		history = model.fit(X, Y, batch_size = 350, epochs = 100)
 
 	res = buildPhrase(input_str, inp_chars, model, tokenizer)
 	print(res)
 
+	model.save('model.h5')
+
 
 if __name__ == '__main__':
 	__main__()
-
 
