@@ -12,7 +12,7 @@ from PIL import Image
 from random import randint
 from tensorflow import keras
 from tensorflow.keras.datasets import mnist
-from tensorflow.keras.layers import Dense, SimpleRNN, Input
+from tensorflow.keras.layers import Dense, SimpleRNN, Input, Dropout
 from tensorflow.keras.preprocessing.text import Tokenizer
 from keras.models import Sequential, load_model
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
@@ -56,7 +56,7 @@ def __main__():
 	tokenizer.fit_on_texts([text])
 	print(tokenizer.word_index)
 
-	input_str = 'Рейстлин:'
+	input_str = 'Крисания'
 	inp_chars = len(input_str)
 	data = tokenizer.texts_to_matrix(text)
 	n = data.shape[0] - inp_chars
@@ -72,6 +72,7 @@ def __main__():
 		model.add(Input((inp_chars, num_characters)))
 		model.add(SimpleRNN(512, activation = 'tanh'))
 		model.add(Dense(256, activation = 'relu'))
+		model.add(Dense(128, activation = 'relu'))
 		model.add(Dense(num_characters, activation = 'softmax'))
 
 		model.summary()
@@ -80,7 +81,7 @@ def __main__():
 
 		history = model.fit(X, Y, batch_size = 350, epochs = 100)
 
-	res = buildPhrase(input_str, inp_chars, model, tokenizer)
+	res = buildPhrase(input_str, inp_chars, model, tokenizer, str_len = 100)
 	print(res)
 
 	model.save('model.h5')
