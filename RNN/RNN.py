@@ -56,7 +56,7 @@ def __main__():
 	tokenizer.fit_on_texts([text])
 	print(tokenizer.word_index)
 
-	input_str = 'Крисания'
+	input_str = 'Такхизис'
 	inp_chars = len(input_str)
 	data = tokenizer.texts_to_matrix(text)
 	n = data.shape[0] - inp_chars
@@ -81,10 +81,10 @@ def __main__():
 
 		history = model.fit(X, Y, batch_size = 350, epochs = 100)
 
-	res = buildPhrase(input_str, inp_chars, model, tokenizer, str_len = 100)
-	print(res)
+		model.save('model.h5')
 
-	model.save('model.h5')
+	res = buildPhrase(input_str, inp_chars, model, tokenizer, str_len = 200)
+	print(res)
 
 
 if __name__ == '__main__':
