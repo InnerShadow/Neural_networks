@@ -56,7 +56,7 @@ def __main__():
 	tokenizer.fit_on_texts([text])
 	print(tokenizer.word_index)
 
-	input_str = 'Такхизис'
+	input_str = 'власть н'
 	inp_chars = len(input_str)
 	data = tokenizer.texts_to_matrix(text)
 	n = data.shape[0] - inp_chars
