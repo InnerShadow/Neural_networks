@@ -71,17 +71,23 @@ def __main__():
 	X = np.array([res[i:i + inp_words, :] for i in range(n)])
 	Y = res[inp_words:]
 
-	model = Sequential()
-	model.add(Input((inp_words, maxWordsCount)))
-	model.add(SimpleRNN(512, activation = 'tanh'))
-	model.add(Dense(256, activation = 'relu'))
-	model.add(Dense(maxWordsCount, activation = 'softmax'))
+	try :
+		model = load_model('model.h5')
+		model.summary()
+	except Exception:
+		model = Sequential()
+		model.add(Input((inp_words, maxWordsCount)))
+		model.add(SimpleRNN(512, activation = 'tanh'))
+		model.add(Dense(256, activation = 'relu'))
+		model.add(Dense(maxWordsCount, activation = 'softmax'))
 
-	model.summary()
+		model.summary()
 
-	model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = 'adam')
+		model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = 'adam')
 
-	history = model.fit(X, Y, batch_size = 256, epochs = 100)
+		history = model.fit(X, Y, batch_size = 256, epochs = 100)
+
+		model.save('model.h5')
 
 	res = buildPhrase("Маджере что сделать", model, tokenizer, 50)
 	print(res)
