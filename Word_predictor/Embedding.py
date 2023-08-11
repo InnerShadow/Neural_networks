@@ -89,7 +89,7 @@ def __main__():
 
 		model.save('Embedding_model.h5')
 
-	res = buildPhrase("Черный маг маджере", model, tokenizer, 50)
+	res = buildPhrase("Брат мне вернул", model, tokenizer, 50)
 	print(res)
 
 
