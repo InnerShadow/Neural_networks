@@ -76,7 +76,7 @@ def __main__():
 	X = np.array([res[i:i + inp_words] for i in range(n)])
 	Y = to_categorical(res[inp_words:], num_classes = maxWordsCount)
 
-	input_str = raw_input("Введите начало предоожения: ")
+	input_str = input("Введите начало предоожения: ")
 
 	try :
 		model = load_model('Stacked_RNN.h5')
