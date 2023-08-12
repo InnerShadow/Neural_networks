@@ -30,8 +30,13 @@ def buildPhrase(texts, model, tokenizer, str_len = 20):
 	global inp_words
 	global maxWordsCount
 
+	if len(texts) > inp_words:
+		texts = texts[:inp_words]
+
 	res = texts
 	data = tokenizer.texts_to_sequences([texts])[0]
+
+	#print(data)
 
 	for i in range(str_len):
 		x = data[i : i + inp_words]
@@ -71,14 +76,16 @@ def __main__():
 	X = np.array([res[i:i + inp_words] for i in range(n)])
 	Y = to_categorical(res[inp_words:], num_classes = maxWordsCount)
 
+	input_str = raw_input("Введите начало предоожения: ")
+
 	try :
-		model = load_model('Embedding_model.h5')
+		model = load_model('Stacked_RNN.h5')
 		model.summary()
 	except Exception:
 		model = Sequential()
 		model.add(Embedding(maxWordsCount, 512, input_length = inp_words))
-		model.add(SimpleRNN(256, activation = 'tanh'))
-		model.add(Dense(128, activation = 'relu'))
+		model.add(SimpleRNN(256, activation = 'tanh', return_sequences = True))
+		model.add(SimpleRNN(128, activation = 'tanh'))
 		model.add(Dense(maxWordsCount, activation = 'softmax'))
 
 		model.summary()
@@ -87,9 +94,9 @@ def __main__():
 
 		history = model.fit(X, Y, batch_size = 256, epochs = 100)
 
-		model.save('Embedding_model.h5')
+		model.save('Stacked_RNN.h5')
 
-	res = buildPhrase("завтра же возвращаюсь", model, tokenizer, 50)
+	res = buildPhrase(input_str, model, tokenizer, 50)
 	print(res)
 
 
