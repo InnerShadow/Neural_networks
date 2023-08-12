@@ -8,19 +8,19 @@ import tensorflow as tf
 import glob
 import re
 
-from PIL import Image
-from random import randint
 from tensorflow import keras
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.layers import Dense, SimpleRNN, Input, Dropout, Embedding
-from tensorflow.keras.preprocessing.text import Tokenizer
+from keras.layers import Dense, SimpleRNN, Input, Dropout, Embedding
+from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential, load_model
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
+from keras.preprocessing.image import ImageDataGenerator
+from keras.utils import to_categorical
+
+from PIL import Image
+
 from skimage.color import rgb2lab, lab2rgb
 from skimage.io import imsave
 from sklearn.model_selection import train_test_split
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
-from tensorflow.keras.utils import to_categorical
 
 inp_words = 3
 maxWordsCount = 10000
