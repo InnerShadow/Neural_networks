@@ -30,13 +30,21 @@ def buildPhrase(texts, model, tokenizer, str_len = 20):
 	global inp_words
 	global maxWordsCount
 
-	if len(texts) > inp_words:
-		texts = texts[:inp_words]
+	words = texts.split()
 
-	res = texts
+	res = ""
+
+	if len(words) > inp_words:
+		for i in range(inp_words):
+			res += " " + words[i]
+	else :
+		res = texts
+	
 	data = tokenizer.texts_to_sequences([texts])[0]
 
-	#print(data)
+	if len(words) < inp_words:
+		for i in range(inp_words - len(words)):
+			data.append(0)
 
 	for i in range(str_len):
 		x = data[i : i + inp_words]
