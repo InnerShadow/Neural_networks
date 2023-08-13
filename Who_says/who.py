@@ -34,36 +34,35 @@ def __main__():
 	global maxWordsCount
 	global max_texts_len
 
-	with open('true', 'r', encoding = 'utf-8') as f:
-		texts_true = f.readlines()
-		texts_true[0] = texts_true[0].replace('\ufeff', '')
-		
-	with open('false', 'r', encoding = 'utf-8') as f:
-		texts_false = f.readlines()
-		texts_false[0] = texts_false[0].replace('\ufeff', '')
-	
-	texts = texts_true + texts_false
-	count_true = len(texts_true)
-	count_false = len(texts_false)
-	total_len = count_true + count_false
-	print(count_true, count_false, total_len)
+	characters = np.array(['Reistlin', 'Krisania', 'King-prist', 'Karamon', 'Takhizis'])
+	lengts = np.zeros(len(characters), dtype = int)
+	total_len = 0
+	texts = []
+
+	for i in range(len(characters)):
+		with open(characters[i], 'r', encoding = 'utf-8') as f:
+			text = f.readlines()
+			text[0] = text[0].replace('\ufeff', '')
+			texts += text
+			lengts[i] = len(text)
+			total_len += len(text)
 
 	tokenizer = Tokenizer(num_words = maxWordsCount, filters = '!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»…'
 		       , lower = True, split = ' ', char_level = False)
 	tokenizer.fit_on_texts(texts)
-
-	#print(dlist[:10])
-	#print(texts[0][:100])
 	
 	dlist = list(tokenizer.word_counts.items())
 	data = tokenizer.texts_to_sequences(texts)
 	data_pad = pad_sequences(data, maxlen = max_texts_len)
-	
-	#print(data_pad)
-	#print(	list(tokenizer.word_index.items()))
 
 	X = data_pad
-	Y = np.array([[1, 0]] * count_true + [[0, 1]] * count_false)
+	Y = np.empty((0, len(characters)), dtype = int)
+	for i in range(len(characters)):
+		arr = np.zeros(len(characters))
+		arr[i] = 1
+		Y_part = np.array([arr] * lengts[i])
+		Y = np.vstack((Y, Y_part))
+
 	print(X.shape, Y.shape)
 
 	indeces = np.random.choice(X.shape[0], size = X.shape[0], replace = False)
@@ -77,28 +76,28 @@ def __main__():
 	except Exception:
 
 		model = Sequential()
-		model.add(Embedding(maxWordsCount, 128, input_length = max_texts_len))
-		model.add(LSTM(128, return_sequences = True))
-		model.add(LSTM(64))
-		model.add(Dense(2, activation = 'softmax'))
+		model.add(Embedding(maxWordsCount, 512, input_length = max_texts_len))
+		model.add(LSTM(256, return_sequences = True))
+		model.add(LSTM(128))
+		model.add(Dense(len(characters), activation = 'softmax'))
 		model.summary()
 
 		model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = Adam(0.0001))
 
-		history = model.fit(X, Y, batch_size = 64, epochs = 50)
+		history = model.fit(X, Y, batch_size = 32, epochs = 50)
 
 		model.save('model.h5')
 
 	reverce_word_map = dict(map(reversed, tokenizer.word_index.items()))
 
-	inp = input("Введите высказывание: ")
+	inp = input("Кто сказал: ")
 	t = inp.lower()
 	data = tokenizer.texts_to_sequences([t])
 	data_pad = pad_sequences(data, maxlen = max_texts_len)
 	print(sequence_to_texts(data[0], reverce_word_map))
 
 	res = model.predict(data_pad)
-	print(res, np.argmax(res), sep = '\n')
+	print(res, characters[np.argmax(res)], sep = '\n')
 
 
 if __name__ == '__main__':
