@@ -91,7 +91,8 @@ def __main__():
 
 	reverce_word_map = dict(map(reversed, tokenizer.word_index.items()))
 
-	t = "Не доверяй никому".lower()
+	inp = input("Введите высказывание: ")
+	t = inp.lower()
 	data = tokenizer.texts_to_sequences([t])
 	data_pad = pad_sequences(data, maxlen = max_texts_len)
 	print(sequence_to_texts(data[0], reverce_word_map))
