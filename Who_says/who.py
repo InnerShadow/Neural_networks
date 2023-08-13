@@ -50,28 +50,28 @@ def __main__():
 	tokenizer = Tokenizer(num_words = maxWordsCount, filters = '!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»…'
 		       , lower = True, split = ' ', char_level = False)
 	tokenizer.fit_on_texts(texts)
-	
-	dlist = list(tokenizer.word_counts.items())
-	data = tokenizer.texts_to_sequences(texts)
-	data_pad = pad_sequences(data, maxlen = max_texts_len)
-
-	X = data_pad
-	Y = np.empty((0, len(characters)), dtype = int)
-	for i in range(len(characters)):
-		arr = np.zeros(len(characters))
-		arr[i] = 1
-		Y_part = np.array([arr] * lengts[i])
-		Y = np.vstack((Y, Y_part))
-
-	indeces = np.random.choice(X.shape[0], size = X.shape[0], replace = False)
-	X = X[indeces]
-	Y = Y[indeces]
 
 	try:
 		model = load_model('model.h5')
 		model.summary()
 
 	except Exception:
+
+		dlist = list(tokenizer.word_counts.items())
+		data = tokenizer.texts_to_sequences(texts)
+		data_pad = pad_sequences(data, maxlen = max_texts_len)
+
+		X = data_pad
+		Y = np.empty((0, len(characters)), dtype = int)
+		for i in range(len(characters)):
+			arr = np.zeros(len(characters))
+			arr[i] = 1
+			Y_part = np.array([arr] * lengts[i])
+			Y = np.vstack((Y, Y_part))
+
+		indeces = np.random.choice(X.shape[0], size = X.shape[0], replace = False)
+		X = X[indeces]
+		Y = Y[indeces]
 
 		model = Sequential()
 		model.add(Embedding(maxWordsCount, 512, input_length = max_texts_len))
