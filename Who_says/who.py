@@ -6,19 +6,11 @@ import tensorflow as tf
 import re
 
 from tensorflow import keras
-from keras.layers import Dense, SimpleRNN, Input, Dropout, Embedding, LSTM
+from keras.layers import Dense, Input, Embedding, LSTM
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential, load_model
-from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
-from keras.utils import to_categorical
 from keras.optimizers import Adam
 from keras.preprocessing.sequence import pad_sequences
-
-from PIL import Image
-
-from skimage.color import rgb2lab, lab2rgb
-from skimage.io import imsave
-from sklearn.model_selection import train_test_split
 
 maxWordsCount = 10000
 max_texts_len = 10
@@ -54,7 +46,6 @@ def __main__():
 
 	except Exception:
 
-		dlist = list(tokenizer.word_counts.items())
 		data = tokenizer.texts_to_sequences(texts)
 		data_pad = pad_sequences(data, maxlen = max_texts_len)
 
