@@ -70,16 +70,24 @@ def __main__():
 	X = X[indeces]
 	Y = Y[indeces]
 
-	model = Sequential()
-	model.add(Embedding(maxWordsCount, 128, input_length = max_texts_len))
-	model.add(LSTM(128, return_sequences = True))
-	model.add(LSTM(64))
-	model.add(Dense(2, activation = 'softmax'))
-	model.summary()
+	try:
+		model = load_model('model.h5')
+		model.summary()
 
-	model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = Adam(0.0001))
+	except Exception:
 
-	history = model.fit(X, Y, batch_size = 32, epochs = 50)
+		model = Sequential()
+		model.add(Embedding(maxWordsCount, 128, input_length = max_texts_len))
+		model.add(LSTM(128, return_sequences = True))
+		model.add(LSTM(64))
+		model.add(Dense(2, activation = 'softmax'))
+		model.summary()
+
+		model.compile(loss = 'categorical_crossentropy', metrics = ['accuracy'], optimizer = Adam(0.0001))
+
+		history = model.fit(X, Y, batch_size = 32, epochs = 50)
+
+		model.save('model.h5')
 
 	reverce_word_map = dict(map(reversed, tokenizer.word_index.items()))
 
