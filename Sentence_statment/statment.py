@@ -86,7 +86,7 @@ def __main__():
 	t = "Не доверяй никому".lower()
 	data = tokenizer.texts_to_sequences([t])
 	data_pad = pad_sequences(data, maxlen = max_texts_len)
-	print(sequence_to_texts(data[0]))
+	print(sequence_to_texts(data[0], reverce_word_map))
 
 	res = model.predict(data_pad)
 	print(res, np.argmax(res), sep = '\n')
