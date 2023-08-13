@@ -64,8 +64,7 @@ def __main__():
 
 	X = data_pad
 	Y = np.array([[1, 0]] * count_true + [[0, 1]] * count_false)
-	print(X.shape, Y.shape)
-
+	
 	indeces = np.random.choice(X.shape[0], size = X.shape[0], replace = False)
 	X = X[indeces]
 	Y = Y[indeces]

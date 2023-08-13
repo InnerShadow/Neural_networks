@@ -63,8 +63,6 @@ def __main__():
 		Y_part = np.array([arr] * lengts[i])
 		Y = np.vstack((Y, Y_part))
 
-	print(X.shape, Y.shape)
-
 	indeces = np.random.choice(X.shape[0], size = X.shape[0], replace = False)
 	X = X[indeces]
 	Y = Y[indeces]
