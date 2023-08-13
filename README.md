@@ -1,1 +1,1 @@
-Neural networks repository to study how it works
+Neural networks repository has content that have been used to study how NN works
