@@ -45,6 +45,7 @@ def buildPhrase(texts, model, tokenizer, str_len = 20):
 	if len(words) < inp_words:
 		for i in range(inp_words - len(words)):
 			data.append(0)
+			
 
 	for i in range(str_len):
 		x = data[i : i + inp_words]
