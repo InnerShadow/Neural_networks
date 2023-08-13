@@ -10,7 +10,6 @@ from keras.layers import Dense, SimpleRNN, Input, Dropout, Embedding, LSTM
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential, load_model
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
-from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import to_categorical
 from keras.optimizers import Adam
 from keras.preprocessing.sequence import pad_sequences
@@ -36,7 +35,6 @@ def __main__():
 
 	characters = np.array(['Reistlin', 'Krisania', 'King-prist', 'Karamon', 'Takhizis'])
 	lengts = np.zeros(len(characters), dtype = int)
-	total_len = 0
 	texts = []
 
 	for i in range(len(characters)):
@@ -45,7 +43,6 @@ def __main__():
 			text[0] = text[0].replace('\ufeff', '')
 			texts += text
 			lengts[i] = len(text)
-			total_len += len(text)
 
 	tokenizer = Tokenizer(num_words = maxWordsCount, filters = '!–"—#$%&amp;()*+,-./:;<=>?@[\\]^_`{|}~\t\n\r«»…'
 		       , lower = True, split = ' ', char_level = False)
