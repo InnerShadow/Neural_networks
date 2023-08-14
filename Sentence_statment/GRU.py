@@ -6,11 +6,10 @@ import tensorflow as tf
 import re
 
 from tensorflow import keras
-from keras.layers import Dense, SimpleRNN, Input, Dropout, Embedding, LSTM
+from keras.layers import Dense, Embedding, GRU
 from keras.preprocessing.text import Tokenizer
 from keras.models import Sequential, load_model
 from keras.preprocessing.image import ImageDataGenerator, array_to_img, img_to_array, load_img
-from keras.preprocessing.image import ImageDataGenerator
 from keras.utils import to_categorical
 from keras.optimizers import Adam
 from keras.preprocessing.sequence import pad_sequences
@@ -70,15 +69,15 @@ def __main__():
 	Y = Y[indeces]
 
 	try:
-		model = load_model('model.h5')
+		model = load_model('GRU_model.h5')
 		model.summary()
 
 	except Exception:
 
 		model = Sequential()
 		model.add(Embedding(maxWordsCount, 128, input_length = max_texts_len))
-		model.add(LSTM(128, return_sequences = True))
-		model.add(LSTM(64))
+		model.add(GRU(128, return_sequences = True))
+		model.add(GRU(64))
 		model.add(Dense(2, activation = 'softmax'))
 		model.summary()
 
@@ -86,7 +85,7 @@ def __main__():
 
 		history = model.fit(X, Y, batch_size = 64, epochs = 50)
 
-		model.save('model.h5')
+		model.save('GRU_model.h5')
 
 	reverce_word_map = dict(map(reversed, tokenizer.word_index.items()))
 
