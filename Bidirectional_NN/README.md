@@ -1,0 +1,1 @@
+Bidirectional NN can predict current sin value based on previous and future valus with some fluctuations.
