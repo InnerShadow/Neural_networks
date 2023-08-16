@@ -20,24 +20,33 @@ def __main__():
 	global N, M
 
 	data = np.array([np.sin(x / 20) for x in range(N)] + 0.1 * np.random.randn(N))
-	plt.plot(data[:100])
-	plt.show()
+	# plt.plot(data[:100])
+	# plt.show()
 
 	off = 3
 	length = off * 2 + 1
-	X = np.array([np.diag(np.hstack((data[i : i + off], data[i + off + 1 : i + length]))) for i in range(N - length)])
-	Y = data[off: N - off - 1]
-	print(X.shape, Y.shape, sep = '\n')
 
-	model = Sequential()
-	model.add(Input((length - 1, length - 1)))
-	model.add(Bidirectional(GRU(2)))
-	model.add(Dense(1, activation = 'linear'))
-	model.summary()
+	# print(X.shape, Y.shape, sep = '\n')
 
-	model.compile(loss = 'mean_squared_error', optimizer = Adam(0.01))
+	try:
+		model = load_model('model.h5')
+		model.summary()
+	except Exception:
 
-	history = model.fit(X, Y, batch_size = 32, epochs = 10)
+		X = np.array([np.diag(np.hstack((data[i : i + off], data[i + off + 1 : i + length]))) for i in range(N - length)])
+		Y = data[off: N - off - 1]
+
+		model = Sequential()
+		model.add(Input((length - 1, length - 1)))
+		model.add(Bidirectional(GRU(2)))
+		model.add(Dense(1, activation = 'linear'))
+		model.summary()
+
+		model.compile(loss = 'mean_squared_error', optimizer = Adam(0.01))
+
+		history = model.fit(X, Y, batch_size = 32, epochs = 10)
+
+		model.save('model.h5')
 
 	XX = np.zeros(M)
 	XX[:off] = data[:off]
