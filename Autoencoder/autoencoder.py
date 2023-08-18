@@ -15,17 +15,6 @@ from keras.datasets import mnist
 
 WHITE_MAX = 255
 
-def show(x_train, N):
-	plt.figure(figsize = (10, 5))
-	for i in range(N):
-		plt.subplot(5, 5, i + 1)
-		plt.xticks([])
-		plt.yticks([])
-		plt.imshow(x_train[i], cmap = plt.cm.binary)
-
-	plt.show()
-
-
 def Get_my_immage():
 	image_path = "Nazar_test_3.png"
 	image = Image.open(image_path)
