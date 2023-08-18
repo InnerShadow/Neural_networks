@@ -47,24 +47,32 @@ def __mian__():
 
     x_train = np.reshape(x_train, (len(x_train), 28, 28, 1))
 
-    img_input = Input((28, 28, 1))
-    x = Flatten()(img_input)
-    x = Dense(128, activation = 'relu')(x)
-    x = Dense(63, activation = 'relu')(x)
-    encoded = Dense(49, activation = 'relu')(x) # hidden
+    try:
+        autoencoder = load_model('autoencoder.h5')
+        autoencoder.summary()
+        
+    except Exception:
 
-    d = Dense(64, activation = 'relu')(encoded)
-    d = Dense(28 * 28, activation = 'sigmoid')(d)
-    decoded = Reshape((28, 28, 1))(d)
+        img_input = Input((28, 28, 1))
+        x = Flatten()(img_input)
+        x = Dense(128, activation = 'relu')(x)
+        x = Dense(63, activation = 'relu')(x)
+        encoded = Dense(49, activation = 'relu')(x) # hidden
 
-    autoencoder = keras.Model(img_input, decoded, name = 'autoencoder')
-    autoencoder.compile(optimizer = 'adam', loss = 'mean_squared_error')
+        d = Dense(64, activation = 'relu')(encoded)
+        d = Dense(28 * 28, activation = 'sigmoid')(d)
+        decoded = Reshape((28, 28, 1))(d)
 
-    batch_size = 100
+        autoencoder = keras.Model(img_input, decoded, name = 'autoencoder')
+        autoencoder.compile(optimizer = 'adam', loss = 'mean_squared_error')
 
-    autoencoder.fit(x_train, x_train, epochs = 20, batch_size = batch_size, shuffle = True)
+        autoencoder.summary()
 
-    autoencoder.summary()
+        batch_size = 100
+
+        autoencoder.fit(x_train, x_train, epochs = 20, batch_size = batch_size, shuffle = True)
+
+        autoencoder.save('autoencoder.h5')
 
     #show
 
