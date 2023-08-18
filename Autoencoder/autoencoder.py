@@ -72,7 +72,7 @@ def __mian__():
         img_input = Input((28, 28, 1))
         x = Flatten()(img_input)
         x = Dense(128, activation = 'relu')(x)
-        x = Dense(63, activation = 'relu')(x)
+        x = Dense(64, activation = 'relu')(x)
         encoded = Dense(49, activation = 'relu')(x) # hidden
 
         d = Dense(64, activation = 'relu')(encoded)
@@ -126,7 +126,7 @@ def __mian__():
         
     plt.show()
 
-    # show difference between direct himotopy and model that build NN
+    # show difference between direct homotopy and model that build NN
 
     frm, to = x_test[y_test == 5][1:3]
     plot_homotopy(frm, to)
