@@ -108,10 +108,14 @@ def __mian__():
 
     res = autoencoder.predict(pixel_array_expand)
 
-    plt.imshow(pixel_array, cmap = plt.cm.binary)
-    plt.show()
+    fig, axes = plt.subplots(1, 2, figsize = (10, 5))
+    axes[0].imshow(pixel_array, cmap = 'gray')
+    axes[0].set_title('Original images')
 
-    plt.imshow(res.squeeze(), cmap = 'gray')
+    axes[1].imshow(res.squeeze(), cmap = 'gray')
+    axes[1].set_title('Reconstucted image')
+
+    plt.tight_layout()
     plt.show()
 
     #show
