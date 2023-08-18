@@ -8,8 +8,8 @@ import matplotlib.pyplot as plt
 
 from PIL import Image
 from tensorflow import keras
-from tensorflow.keras.datasets import mnist
-from tensorflow.keras.layers import Dense, Flatten, Dropout
+from keras.datasets import mnist
+from keras.layers import Dense, Flatten, Dropout
 from sklearn.model_selection import train_test_split
 
 WHITE_MAX = 255

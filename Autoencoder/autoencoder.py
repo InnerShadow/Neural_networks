@@ -5,6 +5,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 
+from PIL import Image
 from tensorflow import keras
 from keras.layers import Dense, Input, Embedding, Flatten, Reshape
 from keras.preprocessing.text import Tokenizer
@@ -13,6 +14,33 @@ from keras.optimizers import Adam
 from keras.datasets import mnist
 
 WHITE_MAX = 255
+
+def show(x_train, N):
+	plt.figure(figsize = (10, 5))
+	for i in range(N):
+		plt.subplot(5, 5, i + 1)
+		plt.xticks([])
+		plt.yticks([])
+		plt.imshow(x_train[i], cmap = plt.cm.binary)
+
+	plt.show()
+
+
+def Get_my_immage():
+	image_path = "Nazar_test_3.png"
+	image = Image.open(image_path)
+
+	gary_image = image.convert("L")
+
+	pixel_array = np.array(gary_image)
+
+	pixel_array = WHITE_MAX - pixel_array
+	pixel_array = pixel_array / WHITE_MAX
+
+	pixel_array_expand = np.expand_dims(pixel_array, axis = 0)
+
+	return pixel_array_expand, pixel_array
+
 
 def plot_digits(*images):
     images = [x.squeeze() for x in images]
@@ -73,6 +101,18 @@ def __mian__():
         autoencoder.fit(x_train, x_train, epochs = 20, batch_size = batch_size, shuffle = True)
 
         autoencoder.save('autoencoder.h5')
+
+    #show my inage
+
+    pixel_array_expand, pixel_array = Get_my_immage()
+
+    res = autoencoder.predict(pixel_array_expand)
+
+    plt.imshow(pixel_array, cmap = plt.cm.binary)
+    plt.show()
+
+    plt.imshow(res.squeeze(), cmap = 'gray')
+    plt.show()
 
     #show
 
