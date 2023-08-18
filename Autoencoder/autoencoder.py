@@ -15,8 +15,7 @@ from keras.datasets import mnist
 
 WHITE_MAX = 255
 
-def Get_my_immage():
-	image_path = "Nazar_test_3.png"
+def Get_my_immage(image_path):
 	image = Image.open(image_path)
 
 	gary_image = image.convert("L")
@@ -91,9 +90,9 @@ def __mian__():
 
         autoencoder.save('autoencoder.h5')
 
-    #show my inage
+    #show my image
 
-    pixel_array_expand, pixel_array = Get_my_immage()
+    pixel_array_expand, pixel_array = Get_my_immage("Nazar_test_3.png")
 
     res = autoencoder.predict(pixel_array_expand)
 
