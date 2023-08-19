@@ -30,6 +30,14 @@ def noiser(args):
     return K.exp(z_log_var / 2) * N + z_mean
 
 
+def vae_loss(x, y, z_mean, z_log_var):
+    global batch_size
+    x = K.reshape(x, shape = (batch_size, 28 * 28))
+    y = K.reshape(y, shape = (batch_size, 28 * 28))
+    loss = K.sum(K.square(x - y), axis = -1)
+    kl_loss = -0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis = -1) # Kullback-Leibler divergence
+    return loss + kl_loss
+
 def __mian__():
     global hidden_dims, batch_size
 
