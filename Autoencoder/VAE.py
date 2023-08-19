@@ -19,18 +19,23 @@ WHITE_MAX = 255
 hidden_dims = 2
 batch_size = 60
 
+z_mean = None
+z_log_var = None
+
 def dropout_and_batchnormlizarion(x):
     return Dropout(0.3)(BatchNormalization()(x))
 
 
 def noiser(args):
+    global z_mean, z_log_var
     global hidden_dims, batch_size
     z_mean, z_log_var = args
     N = K.random_normal(shape = (batch_size, hidden_dims), mean = 0., stddev = 1.0)
     return K.exp(z_log_var / 2) * N + z_mean
 
 
-def vae_loss(x, y, z_mean, z_log_var):
+# x - input data, y - output data
+def vae_loss(x, y):
     global batch_size
     x = K.reshape(x, shape = (batch_size, 28 * 28))
     y = K.reshape(y, shape = (batch_size, 28 * 28))
@@ -38,7 +43,9 @@ def vae_loss(x, y, z_mean, z_log_var):
     kl_loss = -0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis = -1) # Kullback-Leibler divergence
     return loss + kl_loss
 
+
 def __mian__():
+    global z_mean, z_log_var
     global hidden_dims, batch_size
 
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -74,6 +81,15 @@ def __mian__():
     encoder = keras.Model(img_input, h, name = 'encoder')
     decoder = keras.Model(input_dec, decoded, name = 'decoder')
     vae = keras.Model(img_input, decoder(encoder(img_input)), name = 'VAE')
+
+    vae.compile(optimizer = 'adam', loss = vae_loss)
+
+    vae.fit(x_train, x_train, epochs = 5, batch_size = batch_size, shuffle = True)
+
+    #Show set of hidden layer spots
+    h = encoder.predict(x_test[:6000], batch_size = batch_size)
+    plt.scatter(h[:, 0], h[:, 1])
+    plt.show()
 
 
 if __name__ == '__main__':
