@@ -48,6 +48,7 @@ def __mian__():
     global z_mean, z_log_var
     global hidden_dims, batch_size
 
+    #Get train data
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
 
     x_train = x_train / WHITE_MAX
@@ -56,35 +57,51 @@ def __mian__():
     x_train = np.reshape(x_train, (len(x_train), 28, 28, 1))
     x_test = np.reshape(x_test, (len(x_test), 28, 28, 1))
 
-    #Make up codder
-    img_input = Input((28, 28, 1))
-    x = Flatten()(img_input)
-    x = Dense(256, activation = 'relu')(x)
-    x = dropout_and_batchnormlizarion(x)
-    x = Dense(128, activation = 'relu')(x)
-    x = dropout_and_batchnormlizarion(x)
+    #Try to load model
+    try:
+        vae = load_model('VAE.h5', custom_objects = {"vae_loss": vae_loss })
+        encoder = load_model('VAE_encoder.h5')
+        decoder = load_model('VAE_decoder.h5')
 
-    z_mean = Dense(hidden_dims)(x)
-    z_log_var = Dense(hidden_dims)(x)
+        vae.summary()
+    except Exception as e:
 
-    h = Lambda(noiser, output_shape = (hidden_dims,))([z_mean, z_log_var])
+        #Make up codder
+        img_input = Input((28, 28, 1))
+        x = Flatten()(img_input)
+        x = Dense(256, activation = 'relu')(x)
+        x = dropout_and_batchnormlizarion(x)
+        x = Dense(128, activation = 'relu')(x)
+        x = dropout_and_batchnormlizarion(x)
 
-    #Make up decoder
-    input_dec = Input(shape = (hidden_dims,))
-    d = Dense(128, activation = 'relu')(input_dec)
-    d = dropout_and_batchnormlizarion(d)
-    d = Dense(256, activation = 'relu')(input_dec)
-    d = dropout_and_batchnormlizarion(d)
-    d = Dense(28 * 28, activation = 'sigmoid')(d)
-    decoded = Reshape((28, 28, 1))(d)
+        z_mean = Dense(hidden_dims)(x)
+        z_log_var = Dense(hidden_dims)(x)
 
-    encoder = keras.Model(img_input, h, name = 'encoder')
-    decoder = keras.Model(input_dec, decoded, name = 'decoder')
-    vae = keras.Model(img_input, decoder(encoder(img_input)), name = 'VAE')
+        h = Lambda(noiser, output_shape = (hidden_dims,))([z_mean, z_log_var])
 
-    vae.compile(optimizer = 'adam', loss = vae_loss)
+        #Make up decoder
+        input_dec = Input(shape = (hidden_dims,))
+        d = Dense(128, activation = 'relu')(input_dec)
+        d = dropout_and_batchnormlizarion(d)
+        d = Dense(256, activation = 'relu')(input_dec)
+        d = dropout_and_batchnormlizarion(d)
+        d = Dense(28 * 28, activation = 'sigmoid')(d)
+        decoded = Reshape((28, 28, 1))(d)
 
-    vae.fit(x_train, x_train, epochs = 5, batch_size = batch_size, shuffle = True)
+        #Consturate model
+        encoder = keras.Model(img_input, h, name = 'encoder')
+        decoder = keras.Model(input_dec, decoded, name = 'decoder')
+        vae = keras.Model(img_input, decoder(encoder(img_input)), name = 'VAE')
+
+        vae.compile(optimizer = 'adam', loss = vae_loss)
+
+        vae.summary()
+
+        vae.fit(x_train, x_train, epochs = 5, batch_size = batch_size, shuffle = True)
+
+        vae.save('VAE.h5')
+        encoder.save('VAE_encoder.h5')
+        decoder.save('VAE_decoder.h5')
 
     #Show set of hidden layer spots
     h = encoder.predict(x_test[:6000], batch_size = batch_size)
