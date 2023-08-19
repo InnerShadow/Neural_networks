@@ -91,6 +91,23 @@ def __mian__():
     plt.scatter(h[:, 0], h[:, 1])
     plt.show()
 
+    #Test hidden layer dimension
+    n = 5
+    total = 2 * n + 1
+    plt.figure(figsize = (total / 2, total / 2))
+
+    num = 1
+    for i in range(-n, n + 1):
+        for j in range(-n, n + 1):
+            ax = plt.subplot(total, total, num)
+            num += 1
+            img = decoder.predict(np.expand_dims([3 * i / n, 3 * j / n], axis = 0))
+            plt.imshow(img.squeeze(), cmap = 'gray')
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+    plt.show()
+
 
 if __name__ == '__main__':
     __mian__()
