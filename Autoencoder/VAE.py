@@ -57,7 +57,7 @@ def __mian__():
     x_test = np.reshape(x_test, (len(x_test), 28, 28, 1))
 
     #Make up codder
-    img_input = Input(batch_size = (batch_size, 28, 28, 1))
+    img_input = Input((28, 28, 1))
     x = Flatten()(img_input)
     x = Dense(256, activation = 'relu')(x)
     x = dropout_and_batchnormlizarion(x)
