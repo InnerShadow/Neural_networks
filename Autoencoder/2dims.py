@@ -41,6 +41,8 @@ def __mian__():
 
     try:
         autoencoder = load_model('2dims.h5')
+        encoder = load_model('2dEncoder.h5')
+        decoder = load_model('2dDecoder.h5')
         autoencoder.summary()
         
     except Exception:
@@ -49,9 +51,11 @@ def __mian__():
 
         batch_size = 100    
 
-        autoencoder.fit(x_train, x_train, epochs = 20, batch_size = batch_size, shuffle = True)
+        autoencoder.fit(x_train, x_train, epochs = 10, batch_size = batch_size, shuffle = True)
 
         autoencoder.save('2dims.h5')
+        encoder.save('2dEncoder.h5')
+        decoder.save('2dDecoder.h5')
 
     h = encoder.predict(x_test)
 
@@ -62,12 +66,17 @@ def __mian__():
 
     #Show [0, 0] vector & [10, 10] vector
 
-    img = decoder.predict(np.expand_dims([0, 0], axis = 0))
-    plt.imshow(img.squeeze(), cmap = 'gray')
-    plt.show()
+    img0 = decoder.predict(np.expand_dims([0, 0], axis = 0))
+    img10 = decoder.predict(np.expand_dims([10, 10], axis = 0))
 
-    img = decoder.predict(np.expand_dims([10, 10], axis = 0))
-    plt.imshow(img.squeeze(), cmap = 'gray')
+    fig, axes = plt.subplots(1, 2, figsize = (10, 5))
+    axes[0].imshow(img0.squeeze(), cmap = 'gray')
+    axes[0].set_title('[0, 0] vector')
+
+    axes[1].imshow(img10.squeeze(), cmap = 'gray')
+    axes[1].set_title('[10, 10] vecor')
+
+    plt.tight_layout()
     plt.show()
 
 
