@@ -4,3 +4,5 @@ Show difference between direct himotopy and model that build NN.
 2dims.py has 2 dimension hidden layer, visualizations of hidden layer spots and some special cases of vectors.
 VAE.py - VAE has codder with 28 * 28 input, and hidden layer output, that perform calculation the Kullback-Leibler divergence,
 this value is decoder input layer. Decoder output - 28 * 28 array.
+CVAE.py - baisicly VAE.py, but now we have input encoder & decoder class mark. This provide opportunity to
+have diffrent numbers from the same spot of hiddent layer dimension.
