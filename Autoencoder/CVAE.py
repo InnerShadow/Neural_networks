@@ -16,7 +16,7 @@ from keras.datasets import mnist
 
 WHITE_MAX = 255
 
-hidden_dims = 2
+hidden_dim = 2
 num_classes = 10
 batch_size = 100
 
@@ -30,9 +30,8 @@ def dropout_and_batchnormlizarion(x):
 #Random varible generator
 def noiser(args):
     global z_mean, z_log_var
-    global hidden_dims, batch_size
     z_mean, z_log_var = args
-    N = K.random_normal(shape = (batch_size, hidden_dims), mean = 0., stddev = 1.0)
+    N = K.random_normal(shape = (batch_size, hidden_dim), mean = 0., stddev = 1.0)
     return K.exp(z_log_var / 2) * N + z_mean
 
 
@@ -50,16 +49,17 @@ def showDecoderWork(decoder, number):
     n = 4
     total = 2 * n + 1
     input_lbl = np.zeros((1, num_classes))
-    input_lbl[0, number - 1] = 1
+    input_lbl[0, number] = 1
 
-    plt.figure(figsize = (total, total))
-    h = np.zeros((1, hidden_dims))
+    plt.figure(figsize=(total, total))
 
+    h = np.zeros((1, hidden_dim))
     num = 1
     for i in range(-n, n + 1):
         for j in range(-n, n + 1):
             ax = plt.subplot(total, total, num)
             num += 1
+            h[0, :] = [1 * i / n, 1 * j / n]
             img = decoder.predict([h, input_lbl])
             plt.imshow(img.squeeze(), cmap = 'gray')
             ax.get_xaxis().set_visible(False)
@@ -72,8 +72,8 @@ def showDecoderWork(decoder, number):
 def plot_digits(*images):
     images = [x.squeeze() for x in images]
     n = min([x.shape[0] for x in images])
-
-    plt.figure(figsize = n (n, len(images)))
+    
+    plt.figure(figsize=(n, len(images)))
     for j in range(n):
         for i in range(len(images)):
             ax = plt.subplot(len(images), n, i * n + j + 1)
@@ -87,7 +87,7 @@ def plot_digits(*images):
 
 def __mian__():
     global z_mean, z_log_var
-    global hidden_dims, batch_size
+    global hidden_dim, batch_size, num_classes
 
     #Get train data
     (x_train, y_train), (x_test, y_test) = mnist.load_data()
@@ -102,7 +102,7 @@ def __mian__():
     y_test_cat = keras.utils.to_categorical(y_test, num_classes)
 
     #Make up codder
-    img_input = Input((28, 28, 1))
+    img_input = Input(shape = (28, 28, 1))
     fl = Flatten()(img_input) # Get array from image
     lb = Input(shape = (num_classes, )) # Class mark 
     x = concatenate([fl, lb])
@@ -111,18 +111,18 @@ def __mian__():
     x = Dense(128, activation = 'relu')(x)
     x = dropout_and_batchnormlizarion(x)
 
-    z_mean = Dense(hidden_dims)(x)
-    z_log_var = Dense(hidden_dims)(x)
+    z_mean = Dense(hidden_dim)(x)
+    z_log_var = Dense(hidden_dim)(x)
 
-    h = Lambda(noiser, output_shape = (hidden_dims,))([z_mean, z_log_var])
+    h = Lambda(noiser, output_shape=(hidden_dim,))([z_mean, z_log_var])
 
     #Make up decoder
-    input_dec = Input(shape = (hidden_dims,))
+    input_dec = Input(shape = (hidden_dim, ))
     lb_dec = Input(shape = (num_classes, ))
     d = concatenate([input_dec, lb_dec])
-    d = Dense(128, activation = 'relu')(input_dec)
+    d = Dense(128, activation = 'relu')(d)
     d = dropout_and_batchnormlizarion(d)
-    d = Dense(256, activation = 'relu')(input_dec)
+    d = Dense(256, activation = 'relu')(d)
     d = dropout_and_batchnormlizarion(d)
     d = Dense(28 * 28, activation = 'sigmoid')(d)
     decoded = Reshape((28, 28, 1))(d)
@@ -130,11 +130,7 @@ def __mian__():
     #Consturate model
     encoder = keras.Model([img_input, lb], h, name = 'encoder')
     decoder = keras.Model([input_dec, lb_dec], decoded, name = 'decoder')
-    cvae = keras.Model([img_input, lb, lb_dec], decoder([encoder([img_input, lb]), lb_dec]), name = 'CVAE')
-
-    cvae.compile(optimizer = 'adam', loss = vae_loss)
-
-    cvae.summary()
+    cvae = keras.Model([img_input, lb, lb_dec], decoder([encoder([img_input, lb]), lb_dec]), name = "CVAE")
 
     #Transfer writing style from one to another number 
     #(From the same spot of hidden dimension spot, but wuth other class mark)
@@ -142,12 +138,16 @@ def __mian__():
     z_meaner = keras.Model([img_input, lb], z_mean)
     tr_style = keras.Model([img_input, lb, lb_dec], decoder([z_meaner([img_input, lb]), lb_dec]), name = 'tr_style')
 
+    cvae.compile(optimizer = 'adam', loss = vae_loss)
+
+    cvae.summary()
+
     # Train model
     cvae.fit([x_train, y_train_cat, y_train_cat], x_train, epochs = 5, batch_size = batch_size, shuffle = True)
 
     #Show set of hidden layer spots
     lb = lb_dec = y_test_cat
-    h = encoder.predict([x_test, lb, lb_dec], batch_size = batch_size)
+    h = encoder.predict([x_test, lb], batch_size = batch_size)
     plt.scatter(h[:, 0], h[:, 1])
     plt.show()
 
@@ -170,7 +170,7 @@ def __mian__():
         lb_2 = np.zeros((num, num_classes))
         lb_2[:, i] = 1
 
-        Y = tr_style.predict([X, lb_1, lb_2], batch_size = num)
+        Y = tr_style.predict([X, lb_1, lb_2], batch_size=num)
         plot_digits(Y)
 
 
