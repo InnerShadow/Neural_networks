@@ -132,7 +132,7 @@ def __mian__():
         #Make up codder
         input_img = Input(shape = (28, 28, 1))
         fl = Flatten()(input_img) # Get array from image
-        lb = Input(shape = (num_classes,)) # Class mark 
+        lb = Input(shape = (num_classes, )) # Class mark 
         x = concatenate([fl, lb])
         x = Dense(256, activation = 'relu')(x)
         x = dropout_and_batchnormlizarion(x)
@@ -142,7 +142,7 @@ def __mian__():
         z_mean2 = Dense(hidden_dim)(x)
         z_log_var = Dense(hidden_dim)(x)
 
-        h = Lambda(noiser, output_shape=(hidden_dim,))([z_mean2, z_log_var])
+        h = Lambda(noiser, output_shape = (hidden_dim,))([z_mean2, z_log_var])
 
         #Make up decoder
         input_dec = Input(shape = (hidden_dim, ))
