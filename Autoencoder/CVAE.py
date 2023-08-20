@@ -68,6 +68,23 @@ def showDecoderWork(decoder, number):
     plt.show()
 
 
+#Show generated images
+def plot_digits(*images):
+    images = [x.squeeze() for x in images]
+    n = min([x.shape[0] for x in images])
+
+    plt.figure(figsize = n (n, len(images)))
+    for j in range(n):
+        for i in range(len(images)):
+            ax = plt.subplot(len(images), n, i * n + j + 1)
+            plt.imshow(images[i][j])
+            plt.gray()
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+    plt.show()
+
+
 def __mian__():
     global z_mean, z_log_var
     global hidden_dims, batch_size
@@ -119,6 +136,12 @@ def __mian__():
 
     cvae.summary()
 
+    #Transfer writing style from one to another number 
+    #(From the same spot of hidden dimension spot, but wuth other class mark)
+    #(We do not need variance coder output, just mean one).
+    z_meaner = keras.Model([img_input, lb], z_mean)
+    tr_style = keras.Model([img_input, lb, lb_dec], decoder([z_meaner([img_input, lb]), lb_dec]), name = 'tr_style')
+
     # Train model
     cvae.fit([x_train, y_train_cat, y_train_cat], x_train, epochs = 5, batch_size = batch_size, shuffle = True)
 
@@ -131,6 +154,24 @@ def __mian__():
     #Test hidden layer dimension
     showDecoderWork(decoder, 2)
     showDecoderWork(decoder, 8)
+
+    #Test style transfer using z_meaner & tr_style
+    dig1 = 5
+
+    num = 10
+    X = x_train[y_train == dig1][:num]
+
+    lb_1 = np.zeros((num, num_classes))
+    lb_1[:, dig1] = 1
+
+    plot_digits(X)
+
+    for i in range(num_classes):
+        lb_2 = np.zeros((num, num_classes))
+        lb_2[:, i] = 1
+
+        Y = tr_style.predict([X, lb_1, lb_2], batch_size = num)
+        plot_digits(Y)
 
 
 if __name__ == '__main__':
