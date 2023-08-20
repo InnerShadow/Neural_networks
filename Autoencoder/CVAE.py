@@ -205,7 +205,7 @@ def __mian__():
             lb_2 = np.zeros((num, num_classes))
             lb_2[:, i] = 1
 
-            Y = tr_style.predict([X, lb_1, lb_2], batch_size=num)
+            Y = tr_style.predict([X, lb_1, lb_2], batch_size = num)
             plot_digits(Y)
 
     else:
