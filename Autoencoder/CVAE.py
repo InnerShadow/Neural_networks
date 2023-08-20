@@ -118,49 +118,65 @@ def __mian__():
     y_train_cat = keras.utils.to_categorical(y_train, num_classes)
     y_test_cat = keras.utils.to_categorical(y_test, num_classes)
 
-    #Make up codder
-    input_img = Input(shape=(28, 28, 1))
-    fl = Flatten()(input_img) # Get array from image
-    lb = Input(shape=(num_classes,)) # Class mark 
-    x = concatenate([fl, lb])
-    x = Dense(256, activation = 'relu')(x)
-    x = dropout_and_batchnormlizarion(x)
-    x = Dense(128, activation = 'relu')(x)
-    x = dropout_and_batchnormlizarion(x)
+    #Try to load model
+    try:
+        cvae = load_model('CVAE.h5', custom_objects = {"vae_loss": vae_loss})
+        encoder = load_model('CVAE_encoder.h5')
+        decoder = load_model('CVAE_decoder.h5')
+        tr_style = load_model('CVAE_tr_style.h5')
 
-    z_mean2 = Dense(hidden_dim)(x)
-    z_log_var = Dense(hidden_dim)(x)
+        cvae.summary()
 
-    h = Lambda(noiser, output_shape=(hidden_dim,))([z_mean2, z_log_var])
+    except Exception:
 
-    #Make up decoder
-    input_dec = Input(shape = (hidden_dim, ))
-    lb_dec = Input(shape = (num_classes, ))
-    d = concatenate([input_dec, lb_dec])
-    d = Dense(128, activation = 'elu')(d)
-    d = dropout_and_batchnormlizarion(d)
-    d = Dense(256, activation='elu')(d)
-    d = dropout_and_batchnormlizarion(d)
-    d = Dense(28 * 28, activation = 'sigmoid')(d)
-    decoded = Reshape((28, 28, 1))(d)
+        #Make up codder
+        input_img = Input(shape=(28, 28, 1))
+        fl = Flatten()(input_img) # Get array from image
+        lb = Input(shape=(num_classes,)) # Class mark 
+        x = concatenate([fl, lb])
+        x = Dense(256, activation = 'relu')(x)
+        x = dropout_and_batchnormlizarion(x)
+        x = Dense(128, activation = 'relu')(x)
+        x = dropout_and_batchnormlizarion(x)
 
-    #Consturate model
-    encoder = keras.Model([input_img, lb], h, name = 'encoder')
-    decoder = keras.Model([input_dec, lb_dec], decoded, name = 'decoder')
-    cvae = keras.Model([input_img, lb, lb_dec], decoder([encoder([input_img, lb]), lb_dec]), name = "CVAE")
+        z_mean2 = Dense(hidden_dim)(x)
+        z_log_var = Dense(hidden_dim)(x)
 
-    #Transfer writing style from one to another number 
-    #(From the same spot of hidden dimension spot, but wuth other class mark)
-    #(We do not need variance coder output, just mean one).
-    z_meaner = keras.Model([input_img, lb], z_mean2)
-    tr_style = keras.Model([input_img, lb, lb_dec], decoder([z_meaner([input_img, lb]), lb_dec]), name = 'tr_style')
+        h = Lambda(noiser, output_shape=(hidden_dim,))([z_mean2, z_log_var])
 
-    cvae.compile(optimizer = 'adam', loss = vae_loss)
+        #Make up decoder
+        input_dec = Input(shape = (hidden_dim, ))
+        lb_dec = Input(shape = (num_classes, ))
+        d = concatenate([input_dec, lb_dec])
+        d = Dense(128, activation = 'elu')(d)
+        d = dropout_and_batchnormlizarion(d)
+        d = Dense(256, activation='elu')(d)
+        d = dropout_and_batchnormlizarion(d)
+        d = Dense(28 * 28, activation = 'sigmoid')(d)
+        decoded = Reshape((28, 28, 1))(d)
 
-    cvae.summary()
+        #Consturate model
+        encoder = keras.Model([input_img, lb], h, name = 'encoder')
+        decoder = keras.Model([input_dec, lb_dec], decoded, name = 'decoder')
+        cvae = keras.Model([input_img, lb, lb_dec], decoder([encoder([input_img, lb]), lb_dec]), name = "CVAE")
 
-    # Train model
-    cvae.fit([x_train, y_train_cat, y_train_cat], x_train, epochs = 5, batch_size = batch_size, shuffle = True)
+        #Transfer writing style from one to another number 
+        #(From the same spot of hidden dimension spot, but wuth other class mark)
+        #(We do not need variance coder output, just mean one).
+        z_meaner = keras.Model([input_img, lb], z_mean2)
+        tr_style = keras.Model([input_img, lb, lb_dec], decoder([z_meaner([input_img, lb]), lb_dec]), name = 'tr_style')
+
+        cvae.compile(optimizer = 'adam', loss = vae_loss)
+
+        cvae.summary()
+
+        # Train model
+        cvae.fit([x_train, y_train_cat, y_train_cat], x_train, epochs = 5, batch_size = batch_size, shuffle = True)
+
+        cvae.save('CVAE.h5')
+        encoder.save('CVAE_encoder.h5')
+        decoder.save('CVAE_decoder.h5')
+        tr_style.save('CVAE_tr_style.h5')
 
     #Show set of hidden layer spots
     lb = lb_dec = y_test_cat
