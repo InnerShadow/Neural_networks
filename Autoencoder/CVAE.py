@@ -15,6 +15,7 @@ from keras.optimizers import Adam
 from keras.datasets import mnist
 
 WHITE_MAX = 255
+OLD = False # Switch image by image show (True) and all images at screen (False) 
 
 hidden_dim = 2
 num_classes = 10
@@ -68,7 +69,7 @@ def showDecoderWork(decoder, number):
     plt.show()
 
 
-#Show generated images
+#Show generated images ("num" images per screen)
 def plot_digits(*images):
     images = [x.squeeze() for x in images]
     n = min([x.shape[0] for x in images])
@@ -79,6 +80,22 @@ def plot_digits(*images):
             ax = plt.subplot(len(images), n, i * n + j + 1)
             plt.imshow(images[i][j])
             plt.gray()
+            ax.get_xaxis().set_visible(False)
+            ax.get_yaxis().set_visible(False)
+
+    plt.show()
+
+
+#Show generic image & images of the same hidden layer dimension spot 
+def plot_all_images(images):
+    num_images = len(images)
+    n = len(images[0])
+
+    fig, axis = plt.subplots(num_images, n, figsize = (n, num_images))
+    for i, image_list in enumerate(images):
+        for j in range(n):
+            ax = axis[i, j]
+            ax.imshow(image_list[j], cmap = 'gray')
             ax.get_xaxis().set_visible(False)
             ax.get_yaxis().set_visible(False)
 
@@ -153,7 +170,6 @@ def __mian__():
 
     #Test hidden layer dimension
     showDecoderWork(decoder, 2)
-    #showDecoderWork(decoder, 8)
 
     #Test style transfer using z_meaner & tr_style
     dig1 = 5
@@ -164,15 +180,31 @@ def __mian__():
     lb_1 = np.zeros((num, num_classes))
     lb_1[:, dig1] = 1
 
-    plot_digits(X)
+    if(OLD):
+        #Image by image show images base on generic image style
+        #(Do not representative)
+        plot_digits(X)
 
-    for i in range(num_classes):
-        lb_2 = np.zeros((num, num_classes))
-        lb_2[:, i] = 1
+        for i in range(num_classes):
+            lb_2 = np.zeros((num, num_classes))
+            lb_2[:, i] = 1
 
-        Y = tr_style.predict([X, lb_1, lb_2], batch_size=num)
-        plot_digits(Y)
+            Y = tr_style.predict([X, lb_1, lb_2], batch_size=num)
+            plot_digits(Y)
 
+    else:
+        #Show all images on one screen
+        image_list = [X]
+
+        for i in range(num_classes):
+            lb_2 = np.zeros((num, num_classes))
+            lb_2[:, i] = 1
+
+            Y = tr_style.predict([X, lb_1, lb_2], batch_size = num)
+            image_list.append(Y)
+
+        plot_all_images(image_list)
+    
 
 if __name__ == '__main__':
     __mian__()
