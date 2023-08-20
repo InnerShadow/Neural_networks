@@ -52,7 +52,7 @@ def showDecoderWork(decoder, number):
     input_lbl = np.zeros((1, num_classes))
     input_lbl[0, number] = 1
 
-    plt.figure(figsize=(total, total))
+    plt.figure(figsize = (total, total))
 
     h = np.zeros((1, hidden_dim))
     num = 1
@@ -74,7 +74,7 @@ def plot_digits(*images):
     images = [x.squeeze() for x in images]
     n = min([x.shape[0] for x in images])
     
-    plt.figure(figsize=(n, len(images)))
+    plt.figure(figsize = (n, len(images)))
     for j in range(n):
         for i in range(len(images)):
             ax = plt.subplot(len(images), n, i * n + j + 1)
@@ -130,9 +130,9 @@ def __mian__():
     except Exception:
 
         #Make up codder
-        input_img = Input(shape=(28, 28, 1))
+        input_img = Input(shape = (28, 28, 1))
         fl = Flatten()(input_img) # Get array from image
-        lb = Input(shape=(num_classes,)) # Class mark 
+        lb = Input(shape = (num_classes,)) # Class mark 
         x = concatenate([fl, lb])
         x = Dense(256, activation = 'relu')(x)
         x = dropout_and_batchnormlizarion(x)
@@ -148,9 +148,9 @@ def __mian__():
         input_dec = Input(shape = (hidden_dim, ))
         lb_dec = Input(shape = (num_classes, ))
         d = concatenate([input_dec, lb_dec])
-        d = Dense(128, activation = 'elu')(d)
+        d = Dense(128, activation = 'relu')(d)
         d = dropout_and_batchnormlizarion(d)
-        d = Dense(256, activation='elu')(d)
+        d = Dense(256, activation = 'relu')(d)
         d = dropout_and_batchnormlizarion(d)
         d = Dense(28 * 28, activation = 'sigmoid')(d)
         decoded = Reshape((28, 28, 1))(d)
