@@ -86,7 +86,7 @@ def plot_digits(*images):
 
 
 def __mian__():
-    global z_mean, z_log_var
+    global z_log_var
     global hidden_dim, batch_size, num_classes
 
     #Get train data
@@ -102,41 +102,41 @@ def __mian__():
     y_test_cat = keras.utils.to_categorical(y_test, num_classes)
 
     #Make up codder
-    img_input = Input(shape = (28, 28, 1))
-    fl = Flatten()(img_input) # Get array from image
-    lb = Input(shape = (num_classes, )) # Class mark 
+    input_img = Input(shape=(28, 28, 1))
+    fl = Flatten()(input_img) # Get array from image
+    lb = Input(shape=(num_classes,)) # Class mark 
     x = concatenate([fl, lb])
     x = Dense(256, activation = 'relu')(x)
     x = dropout_and_batchnormlizarion(x)
     x = Dense(128, activation = 'relu')(x)
     x = dropout_and_batchnormlizarion(x)
 
-    z_mean = Dense(hidden_dim)(x)
+    z_mean2 = Dense(hidden_dim)(x)
     z_log_var = Dense(hidden_dim)(x)
 
-    h = Lambda(noiser, output_shape=(hidden_dim,))([z_mean, z_log_var])
+    h = Lambda(noiser, output_shape=(hidden_dim,))([z_mean2, z_log_var])
 
     #Make up decoder
     input_dec = Input(shape = (hidden_dim, ))
     lb_dec = Input(shape = (num_classes, ))
     d = concatenate([input_dec, lb_dec])
-    d = Dense(128, activation = 'relu')(d)
+    d = Dense(128, activation = 'elu')(d)
     d = dropout_and_batchnormlizarion(d)
-    d = Dense(256, activation = 'relu')(d)
+    d = Dense(256, activation='elu')(d)
     d = dropout_and_batchnormlizarion(d)
     d = Dense(28 * 28, activation = 'sigmoid')(d)
     decoded = Reshape((28, 28, 1))(d)
 
     #Consturate model
-    encoder = keras.Model([img_input, lb], h, name = 'encoder')
+    encoder = keras.Model([input_img, lb], h, name = 'encoder')
     decoder = keras.Model([input_dec, lb_dec], decoded, name = 'decoder')
-    cvae = keras.Model([img_input, lb, lb_dec], decoder([encoder([img_input, lb]), lb_dec]), name = "CVAE")
+    cvae = keras.Model([input_img, lb, lb_dec], decoder([encoder([input_img, lb]), lb_dec]), name = "CVAE")
 
     #Transfer writing style from one to another number 
     #(From the same spot of hidden dimension spot, but wuth other class mark)
     #(We do not need variance coder output, just mean one).
-    z_meaner = keras.Model([img_input, lb], z_mean)
-    tr_style = keras.Model([img_input, lb, lb_dec], decoder([z_meaner([img_input, lb]), lb_dec]), name = 'tr_style')
+    z_meaner = keras.Model([input_img, lb], z_mean2)
+    tr_style = keras.Model([input_img, lb, lb_dec], decoder([z_meaner([input_img, lb]), lb_dec]), name = 'tr_style')
 
     cvae.compile(optimizer = 'adam', loss = vae_loss)
 
@@ -153,7 +153,7 @@ def __mian__():
 
     #Test hidden layer dimension
     showDecoderWork(decoder, 2)
-    showDecoderWork(decoder, 8)
+    #showDecoderWork(decoder, 8)
 
     #Test style transfer using z_meaner & tr_style
     dig1 = 5
