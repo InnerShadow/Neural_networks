@@ -114,36 +114,37 @@ def __mian__():
     #Get shuffeld "BATCH_SIZE" batcher with "number"
     train_dataset = tf.data.Dataset.from_tensor_slices(x_train).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
-    #Make up generator
-    generator = Sequential([
-        Dense(7 * 7 * 256, activation = 'relu', input_shape = (hidden_dim, )),
-        BatchNormalization(),
-        Reshape((7, 7, 256)),
-        Conv2DTranspose(128, (5, 5), strides = (1, 1), padding = 'same', activation = 'relu'),
-        BatchNormalization(),
-        Conv2DTranspose(64, (5, 5), strides = (2, 2), padding = 'same', activation = 'relu'),
-        BatchNormalization(),
-        Conv2DTranspose(1, (5, 5), strides = (2, 2), padding = 'same', activation = 'sigmoid'),
-    ])
-
-    #Make up Discriminator
-    discriminator = Sequential()
-    discriminator.add(Conv2D(64, (5, 5), strides = (2, 2), padding = 'same', input_shape = [28, 28, 1]))
-    discriminator.add(LeakyReLU())
-    discriminator.add(Dropout(0.3))
-    discriminator.add(Conv2D(128, (5, 5), strides = (2, 2), padding = 'same'))
-    discriminator.add(LeakyReLU())
-    discriminator.add(Dropout(0.3))
-    discriminator.add(Flatten())
-    discriminator.add(Dense(1))
-    
-    generator_optimizer = Adam(1e-4)
-    discriminator_optimizzer = Adam(1e-4)
-
     try:
         generator = load_model('GAN_generator.h5')
         discriminator = load_model('GAN_discriminator.h5')
     except:
+
+        #Make up generator
+        generator = Sequential([
+            Dense(7 * 7 * 256, activation = 'relu', input_shape = (hidden_dim, )),
+            BatchNormalization(),
+            Reshape((7, 7, 256)),
+            Conv2DTranspose(128, (5, 5), strides = (1, 1), padding = 'same', activation = 'relu'),
+            BatchNormalization(),
+            Conv2DTranspose(64, (5, 5), strides = (2, 2), padding = 'same', activation = 'relu'),
+            BatchNormalization(),
+            Conv2DTranspose(1, (5, 5), strides = (2, 2), padding = 'same', activation = 'sigmoid'),
+        ])
+
+        #Make up Discriminator
+        discriminator = Sequential()
+        discriminator.add(Conv2D(64, (5, 5), strides = (2, 2), padding = 'same', input_shape = [28, 28, 1]))
+        discriminator.add(LeakyReLU())
+        discriminator.add(Dropout(0.3))
+        discriminator.add(Conv2D(128, (5, 5), strides = (2, 2), padding = 'same'))
+        discriminator.add(LeakyReLU())
+        discriminator.add(Dropout(0.3))
+        discriminator.add(Flatten())
+        discriminator.add(Dense(1))
+        
+        generator_optimizer = Adam(1e-4)
+        discriminator_optimizzer = Adam(1e-4)
+
         #Do train
         history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizzer)
 
