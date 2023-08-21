@@ -129,62 +129,77 @@ def __mian__():
     #Get shuffeld "BATCH_SIZE" batcher with "number"
     train_dataset = tf.data.Dataset.from_tensor_slices(x_train).shuffle(BUFFER_SIZE).batch(BATCH_SIZE)
 
-    #Make up codder
-    img_input = Input((28, 28, 1))
-    x = Flatten()(img_input)
-    x = Dense(256, activation = 'relu')(x)
-    x = dropout_and_batchnormlizarion(x)
-    x = Dense(128, activation = 'relu')(x)
-    x = dropout_and_batchnormlizarion(x)
+    #Try to load model
+    try:
+        generator = load_model('GUN+CVAE_generator.h5')
+        encoder = load_model('GUN+CVAE_encoder.h5')
+        decoder = load_model('GUN+CVAE_decoder.h5')
+        discriminator = load_model('GUN+CVAE_discriminator.h5')
 
-    #Make up codder outputs with mean and variance
-    z_mean = Dense(hidden_dim)(x)
-    z_log_var = Dense(hidden_dim)(x)
+    except Exception:
+        
+        #Make up codder
+        img_input = Input((28, 28, 1))
+        x = Flatten()(img_input)
+        x = Dense(256, activation = 'relu')(x)
+        x = dropout_and_batchnormlizarion(x)
+        x = Dense(128, activation = 'relu')(x)
+        x = dropout_and_batchnormlizarion(x)
 
-    h = Lambda(noiser, output_shape = (hidden_dim, ))([z_mean, z_log_var])
+        #Make up codder outputs with mean and variance
+        z_mean = Dense(hidden_dim)(x)
+        z_log_var = Dense(hidden_dim)(x)
 
-    #Make up decoder
-    input_dec = Input(shape = (hidden_dim, ))
-    d = Dense(128, activation = 'relu')(input_dec)
-    d = dropout_and_batchnormlizarion(d)
-    d = Dense(256, activation = 'relu')(d)
-    d = dropout_and_batchnormlizarion(d)
-    d = Dense(28 * 28, activation = 'sigmoid')(d)
-    decoded = Reshape((28, 28 , 1))(d)
+        h = Lambda(noiser, output_shape = (hidden_dim, ))([z_mean, z_log_var])
 
-    #Gather NNs at generator 
-    encoder = keras.Model(img_input, h, name = 'encoder')
-    decoder = keras.Model(input_dec, decoded, name = 'decoder')
-    generator = keras.Model(img_input, decoder(encoder(img_input)), name = 'generator')
+        #Make up decoder
+        input_dec = Input(shape = (hidden_dim, ))
+        d = Dense(128, activation = 'relu')(input_dec)
+        d = dropout_and_batchnormlizarion(d)
+        d = Dense(256, activation = 'relu')(d)
+        d = dropout_and_batchnormlizarion(d)
+        d = Dense(28 * 28, activation = 'sigmoid')(d)
+        decoded = Reshape((28, 28 , 1))(d)
 
-    #Make up discriminator 
-    discriminator = Sequential()
-    discriminator.add(Conv2D(64, (5, 5), strides = (2, 2), padding = 'same', input_shape = [28, 28, 1]))
-    discriminator.add(LeakyReLU())
-    discriminator.add(Dropout(0.3))
+        #Gather NNs at generator 
+        encoder = keras.Model(img_input, h, name = 'encoder')
+        decoder = keras.Model(input_dec, decoded, name = 'decoder')
+        generator = keras.Model(img_input, decoder(encoder(img_input)), name = 'generator')
 
-    discriminator.add(Conv2D(128, (5, 5), strides = (2, 2), padding = 'same'))
-    discriminator.add(LeakyReLU())
-    discriminator.add(Dropout(0.3))
+        #Make up discriminator 
+        discriminator = Sequential()
+        discriminator.add(Conv2D(64, (5, 5), strides = (2, 2), padding = 'same', input_shape = [28, 28, 1]))
+        discriminator.add(LeakyReLU())
+        discriminator.add(Dropout(0.3))
 
-    discriminator.add(Flatten())
-    discriminator.add(Dense(1))
+        discriminator.add(Conv2D(128, (5, 5), strides = (2, 2), padding = 'same'))
+        discriminator.add(LeakyReLU())
+        discriminator.add(Dropout(0.3))
 
-    #Make up genarator & discriminator optimizers
-    generator_optimizer = tf.keras.optimizers.Adam(1e-4)
-    discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+        discriminator.add(Flatten())
+        discriminator.add(Dense(1))
 
-    #Do train NN
-    history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizer)
+        #Make up genarator & discriminator optimizers
+        generator_optimizer = tf.keras.optimizers.Adam(1e-4)
+        discriminator_optimizer = tf.keras.optimizers.Adam(1e-4)
+
+        #Do train NN
+        history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizer)
+
+        #Save NNs
+        generator.save('GUN+CVAE_generator.h5')
+        encoder.save('GUN+CVAE_encoder.h5')
+        decoder.save('GUN+CVAE_decoder.h5')
+        discriminator.save('GUN+CVAE_discriminator.h5')
+
+        #Show NN's training history
+        plt.plot(history)
+        plt.grid(True)
+        plt.show()
 
     #Show set of hidden layer spots
     h = encoder.predict(x_test[:6000], batch_size=BATCH_SIZE)
     plt.scatter(h[:, 0], h[:, 1])
-    plt.show()
-
-    #Show NN's training history
-    plt.plot(history)
-    plt.grid(True)
     plt.show()
 
     # Show generated images
