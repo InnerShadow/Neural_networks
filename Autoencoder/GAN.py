@@ -140,13 +140,20 @@ def __mian__():
     generator_optimizer = Adam(1e-4)
     discriminator_optimizzer = Adam(1e-4)
 
-    #Do train
-    history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizzer)
+    try:
+        generator = load_model('GAN_generator.h5')
+        discriminator = load_model('GAN_discriminator.h5')
+    except:
+        #Do train
+        history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizzer)
 
-    #Show loss history
-    plt.plot(history)
-    plt.grid(True)
-    plt.show()
+        generator.save('GAN_generator.h5')
+        discriminator.save('GAN_discriminator.h5')
+
+        #Show loss history
+        plt.plot(history)
+        plt.grid(True)
+        plt.show()
 
     #Show generation resualts
     n = 2
