@@ -177,11 +177,15 @@ def __mian__():
     #Do train NN
     history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizer)
 
+    #Show set of hidden layer spots
     h = encoder.predict(x_test[:6000], batch_size=BATCH_SIZE)
     plt.scatter(h[:, 0], h[:, 1])
+    plt.show()
 
+    #Show NN's training history
     plt.plot(history)
     plt.grid(True)
+    plt.show()
 
     # Show generated images
     n = 2

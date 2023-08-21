@@ -117,6 +117,10 @@ def __mian__():
     try:
         generator = load_model('GAN_generator.h5')
         discriminator = load_model('GAN_discriminator.h5')
+
+        generator.summary()
+        discriminator.summary()
+
     except:
 
         #Make up generator
@@ -144,6 +148,9 @@ def __mian__():
         
         generator_optimizer = Adam(1e-4)
         discriminator_optimizzer = Adam(1e-4)
+
+        generator.summary()
+        discriminator.summary()
 
         #Do train
         history = start_train(train_dataset, EPOCHS, generator, discriminator, generator_optimizer, discriminator_optimizzer)
